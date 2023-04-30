@@ -1,0 +1,35 @@
+{
+  "name": "refisma",
+  "version": "0.0.3",
+  "description": "Refisma is a CLI to create full-stack resources with Next JS, Prisma and Refine",
+  "main": "build/index.js",
+  "source": "src/index.ts",
+  "scripts": {
+    "test": "node build/index.js",
+    "dev": "tsc -w",
+    "update": "npm version patch -f",
+    "pub": "pnpm update && npm publish"
+  },
+  "bin": {
+    "refisma": "./build/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rasitcolakel/refisma.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rasitcolakel/refisma/issues"
+  },
+  "keywords": [
+    "next",
+    "prisma",
+    "refine",
+    "cli"
+  ],
+  "author": "rasitcolakel",
+  "license": "ISC",
+  "dependencies": {
+    "@types/node": "^18.16.3",
+    "typescript": "^5.0.4"
+  }
+}
