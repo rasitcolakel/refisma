@@ -29,7 +29,12 @@
   "author": "rasitcolakel",
   "license": "ISC",
   "dependencies": {
+    "@refinedev/cli": "^2.1.2",
+    "@refinedev/core": "^4.5.8",
     "@types/node": "^18.16.3",
+    "add": "^2.0.6",
+    "chalk": "^4.1.2",
+    "enquirer": "^2.3.6",
     "typescript": "^5.0.4"
   }
 }
