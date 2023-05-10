@@ -1,2 +1,8 @@
 node_modules
 prisma
+/lib/
+/node_modules/
+.pulumi
+/coverage/
+services/
+pages/
