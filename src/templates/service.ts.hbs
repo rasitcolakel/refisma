@@ -1,0 +1,21 @@
+import { Prisma, PrismaClient } from '@prisma/client';
+
+const prisma= new PrismaClient();
+const model= prisma.{{name}};
+
+{{#each methods}}
+export const {{this.name}}{{@root.name}} = async ({{#each params}}{{#if @last}}{{this}}{{else}}{{this}}, {{/if}}{{/each}}) => {
+    const result = await model.{{#if this.prismaMethodName}}{{this.prismaMethodName}}{{else}}{{this.name}}{{/if}}({{#if this.prismaMethodParams}}{    
+    {{#each this.prismaMethodParams}}
+        {{#if this.value}}
+            {{this.name}}:{ 
+                {{#each this.value}}
+                {{this}}{{/each}} },
+            {{else}}{{this.name}},
+        {{/if}}
+    {{/each}} }{{/if}});
+
+    return result;
+
+};
+{{/each}}
