@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { {{#each endpoints}} {{name}}{{@root.name}} {{#unless @last}},{{/unless}} {{/each}} } from 'services/{{name}}.service.ts'
+import { {{#each endpoints}} {{name}}{{@root.name}} {{#unless @last}},{{/unless}} {{/each}} } from '@services/{{name}}Service'
 
 const endpoints =[
 {{#each endpoints}}

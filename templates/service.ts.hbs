@@ -1,7 +1,7 @@
 import { Prisma, PrismaClient } from '@prisma/client';
 
 const prisma= new PrismaClient();
-const model= prisma.{{name}};
+const model= prisma.{{lowercasedName}};
 
 {{#each methods}}
 export const {{this.name}}{{@root.name}} = async ({{#each params}}{{#if @last}}{{this}}{{else}}{{this}}, {{/if}}{{/each}}) => {
