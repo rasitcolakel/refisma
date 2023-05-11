@@ -19,6 +19,9 @@ dependencies:
   '@mui/x-data-grid':
     specifier: ^5.12.1
     version: 5.12.1(@mui/material@5.8.6)(@mui/system@5.12.3)(react-dom@18.0.0)(react@18.0.0)
+  '@prisma/client':
+    specifier: ^4.14.0
+    version: 4.14.0(prisma@4.13.0)
   '@refinedev/cli':
     specifier: ^2.1.2
     version: 2.1.2(@babel/preset-env@7.21.5)(@types/react@18.0.0)(react@18.0.0)
@@ -59,8 +62,8 @@ dependencies:
     specifier: ^18.0.0
     version: 18.0.0(react@18.0.0)
   refisma:
-    specifier: 0.0.6
-    version: 0.0.6
+    specifier: 0.0.8
+    version: 0.0.8
 
 devDependencies:
   '@types/node':
@@ -2094,10 +2097,27 @@ packages:
     resolution: {integrity: sha512-Cr4OjIkipTtcXKjAsm8agyleBuDHvxzeBoa1v543lbv1YaIwQjESsVcmjiWiPEbC1FIeHOG/Op9kdCmAmiS3Kw==}
     dev: false
 
+  /@prisma/client@4.14.0(prisma@4.13.0):
+    resolution: {integrity: sha512-MK/XaA2sFdfaOa7I9MjNKz6dxeIEdeZlnpNRoF2w3JuRLlFJLkpp6cD3yaqw2nUUhbrn3Iqe3ZpVV+VuGGil7Q==}
+    engines: {node: '>=14.17'}
+    requiresBuild: true
+    peerDependencies:
+      prisma: '*'
+    peerDependenciesMeta:
+      prisma:
+        optional: true
+    dependencies:
+      '@prisma/engines-version': 4.14.0-67.d9a4c5988f480fa576d43970d5a23641aa77bc9c
+      prisma: 4.13.0
+    dev: false
+
+  /@prisma/engines-version@4.14.0-67.d9a4c5988f480fa576d43970d5a23641aa77bc9c:
+    resolution: {integrity: sha512-3jum8/YSudeSN0zGW5qkpz+wAN2V/NYCQ+BPjvHYDfWatLWlQkqy99toX0GysDeaUoBIJg1vaz2yKqiA3CFcQw==}
+    dev: false
+
   /@prisma/engines@4.13.0:
     resolution: {integrity: sha512-HrniowHRZXHuGT9XRgoXEaP2gJLXM5RMoItaY2PkjvuZ+iHc0Zjbm/302MB8YsPdWozAPHHn+jpFEcEn71OgPw==}
     requiresBuild: true
-    dev: true
 
   /@radix-ui/react-compose-refs@1.0.0(react@18.0.0):
     resolution: {integrity: sha512-0KaSv6sx787/hK3eF53iOkiSLwAGlFMx5lotrqD2pTjB18KbybKoEIgkNZTKC60YECDQTKGTRcDBILwZVqVKvA==}
@@ -2527,10 +2547,6 @@ packages:
   /@types/node@12.20.11:
     resolution: {integrity: sha512-gema+apZ6qLQK7k7F0dGkGCWQYsL0qqKORWOQO6tq46q+x+1C0vbOiOqOwRVlh4RAdbQwV/j/ryr3u5NOG1fPQ==}
     dev: true
-
-  /@types/node@18.16.3:
-    resolution: {integrity: sha512-OPs5WnnT1xkCBiuQrZA4+YAV4HEJejmHneyraIaxsbev5yCEr6KMwINNFP9wQeFIw8FWcoTqF3vQsa5CDaI+8Q==}
-    dev: false
 
   /@types/parse-json@4.0.0:
     resolution: {integrity: sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==}
@@ -5243,7 +5259,6 @@ packages:
     requiresBuild: true
     dependencies:
       '@prisma/engines': 4.13.0
-    dev: true
 
   /prop-types@15.8.1:
     resolution: {integrity: sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==}
@@ -5448,12 +5463,12 @@ packages:
       esprima: 4.0.1
     dev: false
 
-  /refisma@0.0.6:
-    resolution: {integrity: sha512-9xr4rKCRFOhd8lu5FGg8WuevPQ4is0MAfywoRrDlJVh5TrqWBmVb8Zup60XTAbLVraum4xbal+7CIxZXpkuKSQ==}
+  /refisma@0.0.8:
+    resolution: {integrity: sha512-bzHIbLwXNYewbDiSAWD4mnPPH/xAvFX6VelC0cNb/eJDYAKyhuu80Yn08YMzLo3sUCwAtVcZjL6bQ9KK05arcw==}
+    engines: {node: '>=12.10'}
     hasBin: true
     dependencies:
-      '@types/node': 18.16.3
-      typescript: 5.0.4
+      handlebars: 4.7.7
     dev: false
 
   /regenerate-unicode-properties@10.1.0:
@@ -6094,12 +6109,6 @@ packages:
     engines: {node: '>=4.2.0'}
     hasBin: true
     dev: true
-
-  /typescript@5.0.4:
-    resolution: {integrity: sha512-cW9T5W9xY37cc+jfEnaUvX91foxtHkza3Nw3wkoF4sSlKn0MONdkdEndig/qPBWXNkmplh3NzayQzCiHM4/hqw==}
-    engines: {node: '>=12.20'}
-    hasBin: true
-    dev: false
 
   /uglify-js@3.17.4:
     resolution: {integrity: sha512-T9q82TJI9e/C1TAxYvfb16xO120tMVFZrGA3f9/P4424DNu6ypK103y0GPFVa17yotwSyZW5iYXgjYHkGrJW/g==}
