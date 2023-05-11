@@ -5,12 +5,12 @@ import path from 'path'
 import { Model, Repository } from './../types'
 import prettier from 'prettier'
 export const generateService = (model: Model) => {
-    const template = readFileSync(path.join(process.cwd(), 'src', 'templates', 'service.ts.hbs'), 'utf-8')
+    const template = readFileSync(path.join(__dirname, '../../templates', 'service.ts.hbs'), 'utf-8')
     const templateCompiler = handlebars.compile(template)
 
     const templateParams: Repository = {
         name: model.name,
-        lowercasedName: model.name.toLowerCase(),
+        lowercasedName: model.name.charAt(0).toLowerCase() + model.name.slice(1),
         methods: [
             {
                 name: 'create',
@@ -70,6 +70,6 @@ export const generateService = (model: Model) => {
 
     const compiledTemplate = prettier.format(templateCompiler(templateParams), { parser: 'typescript' })
 
-    writeFile(`services/${model.name}.service.ts`, compiledTemplate)
+    writeFile(`services/${model.name}Service.ts`, compiledTemplate)
     return templateCompiler
 }

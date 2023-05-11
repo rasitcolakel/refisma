@@ -57,10 +57,7 @@ export const generateApiFiles = (model: Model) => {
     })
 }
 export const generateApiFile = (model: Model, templateParams: any, fileName: string) => {
-    console.log('__dirname', __dirname)
-    console.log('process', process.cwd())
-    return
-    const template = readFileSync(path.join(process.cwd(), 'src', 'templates', 'endpoint.ts.hbs'), 'utf-8')
+    const template = readFileSync(path.join(__dirname, '../../templates', 'endpoint.ts.hbs'), 'utf-8')
     const templateCompiler = handlebars.compile(template)
 
     const compiledTemplate = prettier.format(templateCompiler(templateParams), { parser: 'typescript' })
