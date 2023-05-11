@@ -1,6 +1,7 @@
 // read models from  prisma/schema.prisma
 
 import { readFileSync } from 'fs'
+import { Field, Model } from '../types'
 
 export const getModels = (): Model[] => {
     const schema = readFileSync('prisma/schema.prisma', 'utf-8')
@@ -44,32 +45,11 @@ export const parseSchema = (schema: string): Model[] => {
     return models
 }
 
-export type Model = {
-    name: string
-    fields: Field[]
-}
-
-export type Field = {
-    name: string
-    type: string
-    isList: boolean
-    isRequired: boolean
-    isUnique: boolean
-    isId: boolean
-    isUpdatedAt: boolean
-    isCreatedAt: boolean
-    isOptional: boolean
-    isReadOnly: boolean
-    isGenerated: boolean
-}
-
 const parseField = (line: string): Field => {
     // replace all spaces with a single space
     const arrayLine = line.replace(/\s+/g, ' ').trim()
 
     const [name, type, ...options] = arrayLine.split(' ') as string[]
-    console.log({ name, type, options })
-    console.log('type of type', typeof type.startsWith)
 
     const isList = type.startsWith('[') && type.endsWith(']')
     const isRequired = type.endsWith('!')

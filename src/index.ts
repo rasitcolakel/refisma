@@ -2,28 +2,30 @@ import { prompt } from 'enquirer'
 import chalk from 'chalk'
 import { getUIFramework } from './utils'
 import { getModels } from './utils/readModels'
-import { generateApiEndpointsInNextjsForModel } from './utils/generateApiEndpoints'
-
+import { generateService } from './utils/generateService'
+import { generateApiFiles } from './utils/generateApiFiles'
 export const main = async () => {
     const models = getModels()
-
     const response = (await prompt({
-        type: 'select',
+        type: 'multiselect',
         name: 'model',
-        message: 'Which resource name are you trying to create?',
+        message: 'Which resources are you trying to create?',
         choices: models.map((model) => model.name),
-    })) as { model: string }
+    })) as { model: string[] }
 
-    const model = models.find((model) => model.name === response.model)
+    const selectedModels = models.filter((model) => response.model.includes(model.name))
 
-    if (!model) {
-        throw new Error(`Model ${response.model} not found`)
+    if (!selectedModels) {
+        console.log(chalk.red('No models selected'))
+        process.exit(1)
     }
 
     const uiFramework = getUIFramework()
 
-    console.log(chalk.green(`Generating ${model.name} ${uiFramework} files in ${process.cwd()}`))
-    generateApiEndpointsInNextjsForModel(model)
+    for (const model of selectedModels) {
+        generateService(model)
+        generateApiFiles(model)
+    }
 }
 
 main()

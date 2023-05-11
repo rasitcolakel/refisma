@@ -1,0 +1,32 @@
+import { NextApiRequest, NextApiResponse } from 'next'
+import { {{#each endpoints}} {{name}}{{@root.name}} {{#unless @last}},{{/unless}} {{/each}} } from 'services/{{name}}.service.ts'
+
+const endpoints =[
+{{#each endpoints}}
+    {
+        method: '{{method}}',
+        handler: async (req: NextApiRequest, res: NextApiResponse) => {
+            try {
+                const response = await {{name}}{{@root.name}}({{#each params}}{{#if @last}}{{this}}{{else}}{{this}}, {{/if}}{{/each}}) 
+                res.status(200).json(response)
+            } catch (error) {
+                res.status(500).json({
+                    message: error.message,
+                })
+            }
+        },
+    },
+{{/each}}
+]
+
+export const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+    const endpoint = endpoints.find((endpoint) => endpoint.method === req.method)
+
+    if (!endpoint) {
+        res.status(404).json({
+            message: 'Not found',
+        })
+    }else{
+        endpoint.handler(req, res)
+    }
+}
