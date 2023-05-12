@@ -8,3 +8,10 @@ prisma
 /coverage/
 services/
 pages/
+src/
+.eslintignore
+.eslintrc.js
+.gitattributes
+.prettierignore
+.prettierrc
+README.md
