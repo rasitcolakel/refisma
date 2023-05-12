@@ -1,3 +1,5 @@
+import { PrismaScalarTypes, TMethodNames, TPrismaScalarTypes } from '../enums'
+
 export type Endpoint = {
     method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
     handler: (req: any, res: any) => any
@@ -8,7 +10,7 @@ export type Repository = {
     name: string
     lowercasedName: string
     methods: {
-        name: string
+        name: TMethodNames
         params: string[]
         prismaMethodName?: string
         prismaMethodParams?: {
@@ -25,7 +27,7 @@ export type Model = {
 
 export type Field = {
     name: string
-    type: string
+    type: TPrismaScalarTypes
     isList: boolean
     isRequired: boolean
     isUnique: boolean

@@ -24,7 +24,6 @@ export const main = async () => {
 
     for (const model of selectedModels) {
         generateService(model)
-        generateApiFiles(model)
     }
 }
 

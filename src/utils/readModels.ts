@@ -2,6 +2,7 @@
 
 import { readFileSync } from 'fs'
 import { Field, Model } from '../types'
+import { PrismaScalarTypes, TPrismaScalarTypes } from '../enums'
 
 export const getModels = (): Model[] => {
     const schema = readFileSync('prisma/schema.prisma', 'utf-8')
@@ -51,7 +52,7 @@ const parseField = (line: string): Field => {
 
     const [name, type, ...options] = arrayLine.split(' ') as string[]
 
-    const isList = type.startsWith('[') && type.endsWith(']')
+    const isList = type.endsWith('[]') && !PrismaScalarTypes[type.replace('[]', '') as TPrismaScalarTypes]
     const isRequired = type.endsWith('!')
     const isUnique = options.includes('@unique')
     const isId = options.includes('@id')
@@ -63,7 +64,7 @@ const parseField = (line: string): Field => {
 
     return {
         name,
-        type,
+        type: type as TPrismaScalarTypes,
         isList,
         isRequired,
         isUnique,
