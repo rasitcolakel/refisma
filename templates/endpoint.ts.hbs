@@ -1,15 +1,29 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { {{#each endpoints}} {{name}}{{@root.name}} {{#unless @last}},{{/unless}} {{/each}} } from '@services/{{name}}Service'
+import { Prisma } from '@prisma/client';
+
+// Types for the requests
+{{#each serviceMethods}}
+    type {{name}}Request = NextApiRequest 
+    {{#if params.length}}
+        &{
+        {{#each params}}
+            {{this}},
+        {{/each}}
+        }
+    {{/if}}
+{{/each}}
+
 
 const endpoints =[
 {{#each endpoints}}
     {
         method: '{{method}}',
-        handler: async (req: NextApiRequest, res: NextApiResponse) => {
+        handler: async (req: {{name}}Request, res: NextApiResponse) => {
             try {
                 const response = await {{name}}{{@root.name}}({{#each params}}{{#if @last}}{{this}}{{else}}{{this}}, {{/if}}{{/each}}) 
                 res.status(200).json(response)
-            } catch (error) {
+            } catch (error: any) {
                 res.status(500).json({
                     message: error.message,
                 })

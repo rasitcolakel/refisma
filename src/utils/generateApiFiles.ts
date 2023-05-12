@@ -1,6 +1,6 @@
 import { readFileSync } from 'fs'
-import { MethodNames } from '../enums'
-import { Model } from '../types'
+import { MethodNames, TMethodNames } from '../enums'
+import { Model, Repository } from '../types'
 import handlebars from 'handlebars'
 import prettier from 'prettier'
 import path from 'path'
@@ -8,38 +8,39 @@ import { writeFile } from '.'
 
 const endpointsWithId = [
     {
-        name: MethodNames.GET_BY_ID,
-        params: ['req.params.id'],
+        name: MethodNames.getById,
+        params: ['req.query.id'],
         method: 'get',
     },
     {
-        name: MethodNames.UPDATE,
-        params: ['req.params.id', `req.body`],
+        name: MethodNames.update,
+        params: ['req.query.id', `req.body`],
         method: 'put',
     },
     {
-        name: MethodNames.DELETE,
-        params: ['req.params.id'],
+        name: MethodNames.delete,
+        params: ['req.query.id'],
         method: 'delete',
     },
 ]
 
 const endpointsWithoutId = [
     {
-        name: MethodNames.GET,
+        name: MethodNames.findMany,
         method: 'get',
     },
     {
-        name: MethodNames.CREATE,
+        name: MethodNames.create,
         params: ['req.body'],
         method: 'post',
     },
 ]
 
-export const generateApiFiles = (model: Model) => {
-    const templateParams: any = {
+export const generateApiFiles = (model: Model, repository: Repository) => {
+    const templateParams = {
         name: model.name,
         lowercasedName: model.name.toLowerCase(),
+        endpoints: {},
     }
     const files = [
         {
@@ -53,7 +54,16 @@ export const generateApiFiles = (model: Model) => {
     ]
 
     files.map((file) => {
-        generateApiFile(model, { ...templateParams, endpoints: { ...file.params } }, file.name)
+        const names = file.params.map((p) => p.name) as TMethodNames[]
+        generateApiFile(
+            model,
+            {
+                ...templateParams,
+                endpoints: [...file.params],
+                serviceMethods: repository.methods.filter((m) => names.includes(m.name)),
+            },
+            file.name,
+        )
     })
 }
 export const generateApiFile = (model: Model, templateParams: any, fileName: string) => {
