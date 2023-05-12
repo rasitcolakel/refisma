@@ -1,3 +1,4 @@
+import { type } from 'os'
 import { PrismaScalarTypes, TMethodNames, TPrismaScalarTypes } from '../enums'
 
 export type Endpoint = {
@@ -6,16 +7,26 @@ export type Endpoint = {
     cache?: number
 }
 
+type Param = {
+    name: string
+    type: string
+    from?: string
+}
+
 export type Repository = {
     name: string
     lowercasedName: string
     methods: {
+        isSingular: boolean
         name: TMethodNames
-        params: string[]
-        prismaMethodName?: string
-        prismaMethodParams?: {
+        method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
+        customName?: string
+        params: Param[]
+        requestParams: {
             name: string
-            value?: any
+            as?: string
+            type?: string
+            values?: Param[]
         }[]
     }[]
 }

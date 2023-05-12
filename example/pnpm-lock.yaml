@@ -62,8 +62,8 @@ dependencies:
     specifier: ^18.0.0
     version: 18.0.0(react@18.0.0)
   refisma:
-    specifier: 0.0.13
-    version: 0.0.13
+    specifier: 0.0.15
+    version: 0.0.15
 
 devDependencies:
   '@types/node':
@@ -5463,8 +5463,8 @@ packages:
       esprima: 4.0.1
     dev: false
 
-  /refisma@0.0.13:
-    resolution: {integrity: sha512-9K641G+qdKzlxdyWIsOWF19zV76jLqAwGT/o3EVZZpf5jcBalHRz7fuW6qXXwU2KV5TOHoSXRrtJuk6lNDp1rw==}
+  /refisma@0.0.15:
+    resolution: {integrity: sha512-ADm8ayWI1SyrmaUyh8EpqMlAwoBIzLXuUKJVZSzlf4S1K7H7ChvOMJGflbdlsmT34+Cx925Ta/W18pwumlknHg==}
     engines: {node: '>=12.10'}
     hasBin: true
     dependencies:

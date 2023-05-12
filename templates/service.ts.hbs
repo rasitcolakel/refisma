@@ -3,17 +3,22 @@ import { Prisma, PrismaClient } from '@prisma/client';
 const prisma= new PrismaClient();
 const model= prisma.{{lowercasedName}};
 
+
 {{#each methods}}
-export const {{this.name}}{{@root.name}} = async ({{#each params}}{{#if @last}}{{this}}{{else}}{{this}}, {{/if}}{{/each}}) => {
-    const result = await model.{{#if this.prismaMethodName}}{{this.prismaMethodName}}{{else}}{{this.name}}{{/if}}({{#if this.prismaMethodParams}}{    
-    {{#each this.prismaMethodParams}}
-        {{#if this.value}}
-            {{this.name}}:{ 
-                {{#each this.value}}
-                {{this}}{{/each}} },
-            {{else}}{{this.name}},
+export const {{this.name}}{{@root.name}} = async ({{#each params}} {{this.name}}: {{this.type}}{{#unless @last}},{{/unless}}{{/each}}) => {
+    const result = await model.{{#if this.customName}}{{this.customName}}{{else}}{{this.name}}{{/if}}({{#if this.requestParams}}{    
+        {{#each this.requestParams}}
+        {{#if this.as}} {{this.as}} {{else}} {{this.name}}{{/if}}: 
+        {{#if this.values}}
+            {{#each this.values}}{
+                {{this.name}}{{#unless @last}},{{/unless}}
+            },
+            {{/each}}
+        {{else}}
+            {{this.name}}{{#unless @last}},{{/unless}}
         {{/if}}
-    {{/each}} }{{/if}});
+        {{/each}} 
+    }{{/if}});
 
     return result;
 

@@ -1,27 +1,35 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { {{#each endpoints}} {{name}}{{@root.name}} {{#unless @last}},{{/unless}} {{/each}} } from '@services/{{name}}Service'
+import { {{#each methods}} {{name}}{{@root.name}} {{#unless @last}},{{/unless}} {{/each}} } from '@services/{{name}}Service'
 import { Prisma } from '@prisma/client';
 
 // Types for the requests
-{{#each serviceMethods}}
+{{#each methods}}
     type {{name}}Request = NextApiRequest 
-    {{#if params.length}}
+    {{#if this.requestParams.length}}
         &{
-        {{#each params}}
-            {{this}},
+        {{#each this.requestParams}}
+        {{#if this.values}}
+            {{this.name}}:{{#each this.values}}{
+                {{this.name}}:{{this.type}}{{#unless @last}},{{/unless}}
+            },
+            {{/each}}
+        {{else}}
+            {{this.name}}:{{this.type}}{{#unless @last}},{{/unless}}
+        {{/if}}
         {{/each}}
+
         }
     {{/if}}
 {{/each}}
 
 
 const endpoints =[
-{{#each endpoints}}
+{{#each methods}}
     {
         method: '{{method}}',
         handler: async (req: {{name}}Request, res: NextApiResponse) => {
             try {
-                const response = await {{name}}{{@root.name}}({{#each params}}{{#if @last}}{{this}}{{else}}{{this}}, {{/if}}{{/each}}) 
+                const response = await {{name}}{{@root.name}}({{#each params}}{{this.from}}{{#unless @last}},{{/unless}}{{/each}}) 
                 res.status(200).json(response)
             } catch (error: any) {
                 res.status(500).json({
@@ -33,7 +41,7 @@ const endpoints =[
 {{/each}}
 ]
 
-export const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+export const handler = async (req: any, res: NextApiResponse) => {
     const endpoint = endpoints.find((endpoint) => endpoint.method === req.method)
 
     if (!endpoint) {

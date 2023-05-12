@@ -3,7 +3,6 @@ import chalk from 'chalk'
 import { getUIFramework } from './utils'
 import { getModels } from './utils/readModels'
 import { generateService } from './utils/generateService'
-import { generateApiFiles } from './utils/generateApiFiles'
 export const main = async () => {
     const models = getModels()
     const response = (await prompt({
