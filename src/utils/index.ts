@@ -1,6 +1,8 @@
 import { UIFrameworks } from '@refinedev/cli'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs'
 import path from 'path'
+import { Field } from '../types'
+import { PrismaScalarTypes, TPrismaScalarTypes } from '../enums'
 
 export const getPackageJson = (): any => {
     if (!existsSync('package.json')) {
@@ -57,4 +59,27 @@ export const writeFile = (filePath: string, content: string) => {
     }
 
     writeFileSync(path.join(process.cwd(), filePath), content)
+}
+
+export const getFieldByName = (fields: Field[], name: string) => {
+    return fields.find((field) => field.name === name)
+}
+
+export const getFieldType = (field: Field): TPrismaScalarTypes | undefined => {
+    if (field.type && PrismaScalarTypes[field.type]) {
+        return field.type
+    }
+}
+
+export const prismaTypeToTS = (type: TPrismaScalarTypes) => {
+    if (type === PrismaScalarTypes.Int) return 'number'
+    if (type === PrismaScalarTypes.String) return 'string'
+    if (type === PrismaScalarTypes.Boolean) return 'boolean'
+    if (type === PrismaScalarTypes.DateTime) return 'Date'
+    if (type === PrismaScalarTypes.Json) return 'any'
+    if (type === PrismaScalarTypes.Bytes) return 'any'
+    if (type === PrismaScalarTypes.Decimal) return 'number'
+    if (type === PrismaScalarTypes.BigInt) return 'number'
+    if (type === PrismaScalarTypes.Float) return 'number'
+    if (type === PrismaScalarTypes.Unsupported) return 'any'
 }
