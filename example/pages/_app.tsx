@@ -20,7 +20,7 @@ import { appWithTranslation, useTranslation } from "next-i18next";
 import { authProvider } from "src/authProvider";
 import { AppIcon } from "src/components/app-icon";
 
-const API_URL = "https://api.fake-rest.refine.dev";
+const API_URL = "http://localhost:3000/api";
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   noLayout?: boolean;
@@ -76,11 +76,11 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout): JSX.Element {
               i18nProvider={i18nProvider}
               resources={[
                 {
-                  name: "blog_posts",
-                  list: "/blog-posts",
-                  create: "/blog-posts/create",
-                  edit: "/blog-posts/edit/:id",
-                  show: "/blog-posts/show/:id",
+                  name: "post",
+                  list: "/post",
+                  create: "/post/create",
+                  edit: "/post/edit/:id",
+                  show: "/post/show/:id",
                   meta: {
                     canDelete: true,
                   },
