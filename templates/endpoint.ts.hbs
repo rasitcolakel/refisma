@@ -41,7 +41,7 @@ const endpoints =[
 {{/each}}
 ]
 
-export const handler = async (req: any, res: NextApiResponse) => {
+const handler = async (req: any, res: NextApiResponse) => {
     const endpoint = endpoints.find((endpoint) => endpoint.method === req.method)
 
     if (!endpoint) {
@@ -52,3 +52,5 @@ export const handler = async (req: any, res: NextApiResponse) => {
         endpoint.handler(req, res)
     }
 }
+
+export default handler;
