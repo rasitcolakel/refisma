@@ -29,6 +29,7 @@ export type Repository = {
             values?: Param[]
         }[]
     }[]
+    zodSchema?: ZodModel[]
 }
 
 export type Model = {
@@ -40,6 +41,7 @@ export type Field = {
     name: string
     type: TPrismaScalarTypes
     isList: boolean
+    isRelation: boolean
     isRequired: boolean
     isUnique: boolean
     isId: boolean
@@ -48,4 +50,12 @@ export type Field = {
     isOptional: boolean
     isReadOnly: boolean
     isGenerated: boolean
+}
+
+export type ZodModel = {
+    name: string
+    type: string
+    required: boolean
+    optional: boolean
+    id: boolean
 }

@@ -6,3 +6,4 @@ prisma
 /coverage/
 services/
 pages/
+schemas/
