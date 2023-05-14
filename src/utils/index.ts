@@ -106,7 +106,6 @@ export const generateZodSchema = (fields: Field[]): ZodModel[] => {
 }
 
 export const prismaTypeToZod = (type: TPrismaScalarTypes) => {
-    console.log('prismaTypeToZod', type)
     switch (type) {
         case PrismaScalarTypes.Int:
         case PrismaScalarTypes.BigInt:

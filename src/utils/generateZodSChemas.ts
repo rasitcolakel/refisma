@@ -6,7 +6,6 @@ import path from 'path'
 import { writeFile } from '.'
 
 export const generateZodFile = (model: Model, templateParams: Repository) => {
-    console.log('generateZodFile', templateParams)
     const template = readFileSync(path.join(__dirname, '../../templates', 'zodSchemas.ts.hbs'), 'utf-8')
     const templateCompiler = handlebars.compile(template)
 
