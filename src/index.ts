@@ -26,8 +26,6 @@ export const main = async () => {
     }
 }
 
-main()
-
 export const validateSchema = (schema: any) => {
     return async (req: any, res: any, next: any) => {
         try {

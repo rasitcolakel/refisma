@@ -11,7 +11,7 @@ devDependencies:
     version: 2.5.3(@babel/preset-env@7.21.5)(@types/react@18.2.6)(react@17.0.2)
   '@refinedev/core':
     specifier: ^4.14.3
-    version: 4.14.3(@tanstack/react-query@4.29.5)(@types/react-dom@18.2.4)(@types/react@18.2.6)(react-dom@18.2.0)(react@17.0.2)
+    version: 4.14.3(@tanstack/react-query@4.29.7)(@types/react-dom@18.2.4)(@types/react@18.2.6)(react-dom@18.2.0)(react@17.0.2)
   '@types/jest':
     specifier: ^29.5.1
     version: 29.5.1
@@ -1945,7 +1945,7 @@ packages:
       - utf-8-validate
     dev: true
 
-  /@refinedev/core@4.14.3(@tanstack/react-query@4.29.5)(@types/react-dom@18.2.4)(@types/react@18.2.6)(react-dom@18.2.0)(react@17.0.2):
+  /@refinedev/core@4.14.3(@tanstack/react-query@4.29.7)(@types/react-dom@18.2.4)(@types/react@18.2.6)(react-dom@18.2.0)(react@17.0.2):
     resolution: {integrity: sha512-bUnfk+UDBtlj83rXgtEpt+8J8d7OaF/T6Tdx/5JX59holDnkdft2D0xek0bRHNJyM3aRtyWov0tNICkRuAeRzQ==}
     peerDependencies:
       '@tanstack/react-query': ^4.10.1
@@ -1954,8 +1954,8 @@ packages:
       react: ^17.0.0 || ^18.0.0
       react-dom: ^17.0.0 || ^18.0.0
     dependencies:
-      '@tanstack/react-query': 4.29.5(react-dom@18.2.0)(react@17.0.2)
-      '@tanstack/react-query-devtools': 4.29.6(@tanstack/react-query@4.29.5)(react-dom@18.2.0)(react@17.0.2)
+      '@tanstack/react-query': 4.29.7(react-dom@18.2.0)(react@17.0.2)
+      '@tanstack/react-query-devtools': 4.29.7(@tanstack/react-query@4.29.7)(react-dom@18.2.0)(react@17.0.2)
       '@types/react': 18.2.6
       '@types/react-dom': 18.2.4
       export-to-csv-fix-source-map: 0.2.1
@@ -2087,27 +2087,27 @@ packages:
       remove-accents: 0.4.2
     dev: true
 
-  /@tanstack/query-core@4.29.5:
-    resolution: {integrity: sha512-xXIiyQ/4r9KfaJ3k6kejqcaqFXXBTzN2aOJ5H1J6aTJE9hl/nbgAdfF6oiIu0CD5xowejJEJ6bBg8TO7BN4NuQ==}
+  /@tanstack/query-core@4.29.7:
+    resolution: {integrity: sha512-GXG4b5hV2Loir+h2G+RXhJdoZhJLnrBWsuLB2r0qBRyhWuXq9w/dWxzvpP89H0UARlH6Mr9DiVj4SMtpkF/aUA==}
     dev: true
 
-  /@tanstack/react-query-devtools@4.29.6(@tanstack/react-query@4.29.5)(react-dom@18.2.0)(react@17.0.2):
-    resolution: {integrity: sha512-qpYI41a69MWmrllcGiSE1KlpmnwJY/w0yKMnmp6VXn7nVy0i5TMMAT4u8D48F1Ipv/BKIDI1lqxPAvB4MqryBg==}
+  /@tanstack/react-query-devtools@4.29.7(@tanstack/react-query@4.29.7)(react-dom@18.2.0)(react@17.0.2):
+    resolution: {integrity: sha512-fckNnBV6Kfbtq6EJqQen8oBjPqGFcOPS9SJmNKLbFLQgd7OpNIlA4M0r37iJYUY9m14/ESKc1wzKd36VfeiPjg==}
     peerDependencies:
-      '@tanstack/react-query': 4.29.5
+      '@tanstack/react-query': 4.29.7
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
     dependencies:
       '@tanstack/match-sorter-utils': 8.8.4
-      '@tanstack/react-query': 4.29.5(react-dom@18.2.0)(react@17.0.2)
+      '@tanstack/react-query': 4.29.7(react-dom@18.2.0)(react@17.0.2)
       react: 17.0.2
       react-dom: 18.2.0(react@17.0.2)
       superjson: 1.12.3
       use-sync-external-store: 1.2.0(react@17.0.2)
     dev: true
 
-  /@tanstack/react-query@4.29.5(react-dom@18.2.0)(react@17.0.2):
-    resolution: {integrity: sha512-F87cibC3s3eG0Q90g2O+hqntpCrudKFnR8P24qkH9uccEhXErnJxBC/AAI4cJRV2bfMO8IeGZQYf3WyYgmSg0w==}
+  /@tanstack/react-query@4.29.7(react-dom@18.2.0)(react@17.0.2):
+    resolution: {integrity: sha512-ijBWEzAIo09fB1yd22slRZzprrZ5zMdWYzBnCg5qiXuFbH78uGN1qtGz8+Ed4MuhaPaYSD+hykn+QEKtQviEtg==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
@@ -2118,7 +2118,7 @@ packages:
       react-native:
         optional: true
     dependencies:
-      '@tanstack/query-core': 4.29.5
+      '@tanstack/query-core': 4.29.7
       react: 17.0.2
       react-dom: 18.2.0(react@17.0.2)
       use-sync-external-store: 1.2.0(react@17.0.2)
