@@ -1,6 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { {{#each methods}} {{name}}{{@root.name}} {{#unless @last}},{{/unless}} {{/each}} } from '@services/{{name}}Service'
+import { {{#each methods}} {{this.name}}{{@root.name}}Schema {{#unless @last}},{{/unless}} {{/each}} } from '@schemas/{{name}}Schema'
 import { Prisma } from '@prisma/client';
+import { validateSchema } from "refisma";
 
 // Types for the requests
 {{#each methods}}
@@ -27,7 +29,9 @@ const endpoints =[
 {{#each methods}}
     {
         method: '{{method}}',
-        handler: async (req: {{name}}Request, res: NextApiResponse) => {
+        handler: 
+        async (req: {{name}}Request, res: NextApiResponse) => 
+        validateSchema({{this.name}}{{@root.name}}Schema)(req, res, async (req: {{name}}Request, res: NextApiResponse) => {
             try {
                 const response = await {{name}}{{@root.name}}({{#each params}}{{this.from}}{{#unless @last}},{{/unless}}{{/each}}) 
                 res.status(200).json(response)
@@ -36,7 +40,7 @@ const endpoints =[
                     message: error.message,
                 })
             }
-        },
+        }),
     },
 {{/each}}
 ]
