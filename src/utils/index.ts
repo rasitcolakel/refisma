@@ -83,3 +83,7 @@ export const prismaTypeToTS = (type: TPrismaScalarTypes) => {
     if (type === PrismaScalarTypes.Float) return 'number'
     if (type === PrismaScalarTypes.Unsupported) return 'any'
 }
+
+export const findIdField = (fields: Field[]): Field => {
+    return fields.find((field) => field.isId) as Field
+}

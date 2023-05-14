@@ -1,4 +1,4 @@
-import { getFieldByName, getFieldType, prismaTypeToTS, writeFile } from './../utils'
+import { findIdField, getFieldType, prismaTypeToTS, writeFile } from './../utils'
 import { readFileSync } from 'fs'
 import handlebars from 'handlebars'
 import path from 'path'
@@ -10,18 +10,15 @@ export const generateService = (model: Model) => {
     const template = readFileSync(path.join(__dirname, '../../templates', 'service.ts.hbs'), 'utf-8')
     const templateCompiler = handlebars.compile(template)
 
-    const idField = getFieldByName(model.fields, 'id')
+    const idField = findIdField(model.fields)
 
     if (!idField) {
-        throw new Error(`Model ${model.name} does not have an id field`)
+        throw new Error(`Model ${model.name} does not have an @id field`)
     }
-    const prismaTypeOfId = getFieldType(idField)
-    if (!prismaTypeOfId) {
-        throw new Error(`Model ${model.name} does not have an id field`)
-    }
-    const typeOfId = prismaTypeToTS(prismaTypeOfId)
+
+    const typeOfId = prismaTypeToTS(idField.type)
     if (!typeOfId) {
-        throw new Error(`Model ${model.name} does not have an id field`)
+        throw new Error(`Model ${model.name} does not have an @id field`)
     }
 
     const templateParams: Repository = {
@@ -53,9 +50,9 @@ export const generateService = (model: Model) => {
                 method: 'GET',
                 params: [
                     {
-                        name: 'id',
+                        name: idField.name,
                         type: typeOfId,
-                        from: 'req.query.id',
+                        from: 'req.query.' + idField.name,
                     },
                 ],
                 customName: 'findUnique',
@@ -65,7 +62,7 @@ export const generateService = (model: Model) => {
                         as: 'where',
                         values: [
                             {
-                                name: 'id',
+                                name: idField.name,
                                 type: typeOfId,
                             },
                         ],
@@ -85,9 +82,9 @@ export const generateService = (model: Model) => {
                 name: MethodNames.update,
                 params: [
                     {
-                        name: 'id',
+                        name: idField.name,
                         type: typeOfId,
-                        from: 'req.query.id',
+                        from: 'req.query.' + idField.name,
                     },
                     {
                         name: 'body',
@@ -101,7 +98,7 @@ export const generateService = (model: Model) => {
                         as: 'where',
                         values: [
                             {
-                                name: 'id',
+                                name: idField.name,
                                 type: typeOfId,
                             },
                         ],
@@ -119,9 +116,9 @@ export const generateService = (model: Model) => {
                 name: MethodNames.delete,
                 params: [
                     {
-                        name: 'id',
+                        name: idField.name,
                         type: typeOfId,
-                        from: 'req.query.id',
+                        from: 'req.query.' + idField.name,
                     },
                 ],
                 requestParams: [
@@ -130,7 +127,7 @@ export const generateService = (model: Model) => {
                         as: 'where',
                         values: [
                             {
-                                name: 'id',
+                                name: idField.name,
                                 type: typeOfId,
                             },
                         ],
