@@ -27,3 +27,12 @@ export const main = async () => {
 }
 
 main()
+
+export const validateSchema = (schema: any) => async (req: any, res: any, next: any) => {
+    try {
+        await schema.parseAsync(req)
+        next()
+    } catch (err: any) {
+        res.status(400).json({ error: err.errors })
+    }
+}

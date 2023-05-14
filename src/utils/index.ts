@@ -3,6 +3,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs'
 import path from 'path'
 import { Field } from '../types'
 import { PrismaScalarTypes, TPrismaScalarTypes } from '../enums'
+import { ZodModel } from '../types'
 
 export const getPackageJson = (): any => {
     if (!existsSync('package.json')) {
@@ -86,4 +87,45 @@ export const prismaTypeToTS = (type: TPrismaScalarTypes) => {
 
 export const findIdField = (fields: Field[]): Field => {
     return fields.find((field) => field.isId) as Field
+}
+
+export const generateZodSchema = (fields: Field[]): ZodModel[] => {
+    const schema = fields
+        .filter((field) => !field.isList && !field.isRelation)
+        .map((field) => {
+            return {
+                name: field.name,
+                type: prismaTypeToZod(field.type.replace('?', '') as TPrismaScalarTypes),
+                required: field.isRequired,
+                optional: field.isOptional,
+                id: field.isId,
+            }
+        })
+
+    return schema
+}
+
+export const prismaTypeToZod = (type: TPrismaScalarTypes) => {
+    console.log('prismaTypeToZod', type)
+    switch (type) {
+        case PrismaScalarTypes.Int:
+        case PrismaScalarTypes.BigInt:
+        case PrismaScalarTypes.Float:
+        case PrismaScalarTypes.Decimal:
+            return 'number'
+        case PrismaScalarTypes.String:
+            return 'string'
+        case PrismaScalarTypes.Boolean:
+            return 'boolean'
+        case PrismaScalarTypes.DateTime:
+            return 'date'
+        case PrismaScalarTypes.Json:
+            return 'any'
+        case PrismaScalarTypes.Bytes:
+            return 'any'
+        case PrismaScalarTypes.Unsupported:
+            return 'any'
+        default:
+            return 'any'
+    }
 }

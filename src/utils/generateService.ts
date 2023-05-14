@@ -1,4 +1,4 @@
-import { findIdField, getFieldType, prismaTypeToTS, writeFile } from './../utils'
+import { findIdField, generateZodSchema, getFieldType, prismaTypeToTS, writeFile } from './../utils'
 import { readFileSync } from 'fs'
 import handlebars from 'handlebars'
 import path from 'path'
@@ -6,6 +6,7 @@ import { Model, Repository } from './../types'
 import prettier from 'prettier'
 import { MethodNames } from '../enums'
 import { generateApiFile } from './generateApiFiles'
+import { generateZodFile } from './generateZodSChemas'
 export const generateService = (model: Model) => {
     const template = readFileSync(path.join(__dirname, '../../templates', 'service.ts.hbs'), 'utf-8')
     const templateCompiler = handlebars.compile(template)
@@ -135,12 +136,12 @@ export const generateService = (model: Model) => {
                 ],
             },
         ],
+        zodSchema: generateZodSchema(model.fields),
     }
-
     const compiledTemplate = prettier.format(templateCompiler(templateParams), { parser: 'typescript' })
 
     writeFile(`services/${model.name}Service.ts`, compiledTemplate)
-
+    generateZodFile(model, templateParams)
     // generate single file for all endpoints
     generateApiFile(
         model,

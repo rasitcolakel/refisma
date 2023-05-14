@@ -52,13 +52,15 @@ const parseField = (line: string): Field => {
 
     const [name, type, ...options] = arrayLine.split(' ') as string[]
 
-    const isList = type.endsWith('[]') && !PrismaScalarTypes[type.replace('[]', '') as TPrismaScalarTypes]
-    const isRequired = type.endsWith('!')
+    const isList = type.endsWith('[]')
+    const isRelation =
+        !PrismaScalarTypes[(isList ? type.replace('[]', '') : type.replace('?', '')) as TPrismaScalarTypes]
+    const isRequired = !type.includes('?')
     const isUnique = options.includes('@unique')
     const isId = options.includes('@id')
     const isUpdatedAt = options.includes('@updatedAt')
     const isCreatedAt = options.includes('@createdAt')
-    const isOptional = options.includes('@optional')
+    const isOptional = type.includes('?')
     const isReadOnly = options.includes('@readOnly')
     const isGenerated = options.includes('@generated')
 
@@ -66,6 +68,7 @@ const parseField = (line: string): Field => {
         name,
         type: type as TPrismaScalarTypes,
         isList,
+        isRelation,
         isRequired,
         isUnique,
         isId,
