@@ -30,7 +30,7 @@
     "nookies": "^2.5.2",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
-    "refisma": "0.0.17",
+    "refisma": "0.0.18",
     "zod": "^3.21.4"
   },
   "devDependencies": {

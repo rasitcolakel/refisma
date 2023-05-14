@@ -4,7 +4,7 @@ const body = z.object({
 	{{#each zodSchema}}
     	{{#if this.id}}
         {{else}}
-    	{{this.name}}: z.{{this.type}}(){{#if this.required}}.required(){{else}}.optional(){{/if}}{{#unless @last}},{{/unless}} 
+    	{{this.name}}: z.{{this.type}}(){{#if this.optional}}.optional(){{/if}}{{#unless @last}},{{/unless}} 
         {{/if}}
     {{/each}}
 })
@@ -12,13 +12,13 @@ const body = z.object({
 const query = z.object({
 	{{#each zodSchema}}
     	{{#if this.id}}
-        {{this.name}}: z.{{this.type}}(){{#if this.required}}.required(){{else}}.optional(){{/if}}{{#unless @last}},{{/unless}} 
+    	{{this.name}}: z.{{this.type}}(){{#if this.optional}}.optional(){{/if}}{{#unless @last}},{{/unless}} 
         {{/if}}
     {{/each}}
 })
 	
 {{#each methods}}
-export	const {{this.name}}Schema = z.model({
+export	const {{this.name}}Schema = z.object({
     	{{#each requestParams}}
         	{{this.name}}{{#unless @last}},{{/unless}} 
         {{/each}}
