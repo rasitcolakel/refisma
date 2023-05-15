@@ -17,11 +17,11 @@ npm install -g refisma
 
 ## Upcoming Features
 
-- [ ] Types will be based on the Prisma schema
+- [x] Types will be based on the Prisma schema
+- [x] Zod validation
 - [ ] Pagination
 - [ ] Sorting
 - [ ] Filtering
-- [ ] Zod validation
 - [ ] Generating services and endpoints for Relations
   - [ ] One to One
   - [ ] One to Many
