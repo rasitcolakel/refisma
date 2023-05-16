@@ -105,6 +105,10 @@ export const generateZodSchema = (fields: Field[]): ZodModel[] => {
     return schema
 }
 
+export const excludeRelationFields = (fields: Field[]): Field[] => {
+    return fields.filter((field) => !field.isList && !field.isRelation)
+}
+
 export const prismaTypeToZod = (type: TPrismaScalarTypes) => {
     switch (type) {
         case PrismaScalarTypes.Int:

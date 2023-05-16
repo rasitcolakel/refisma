@@ -1,0 +1,21 @@
+{{> imports name=name }}
+
+export default function {{name}}List() {
+    const t = useTranslate();
+    const { dataGridProps } = useDataGrid<{{name}}>();
+
+    {{> columns fields=excludedModels name=name }}
+
+    return (
+      <List canCreate>
+        <DataGrid
+          {...dataGridProps}
+          autoHeight
+          columns={columns}
+          density="comfortable"
+        />
+      </List>
+    );
+
+}
+

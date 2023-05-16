@@ -72,7 +72,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout): JSX.Element {
               routerProvider={routerProvider}
               dataProvider={dataProvider(API_URL)}
               notificationProvider={notificationProvider}
-              authProvider={authProvider}
+              // authProvider={authProvider}
               i18nProvider={i18nProvider}
               resources={[
                 {
@@ -91,6 +91,16 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout): JSX.Element {
                   create: "/categories/create",
                   edit: "/categories/edit/:id",
                   show: "/categories/show/:id",
+                  meta: {
+                    canDelete: true,
+                  },
+                },
+                {
+                  name: "user",
+                  list: "/user",
+                  create: "/user/create",
+                  edit: "/user/edit/:id",
+                  show: "/user/show/:id",
                   meta: {
                     canDelete: true,
                   },
