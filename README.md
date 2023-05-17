@@ -26,3 +26,9 @@ npm install -g refisma
   - [ ] One to One
   - [ ] One to Many
   - [ ] Many to Many
+- [ ] Refine Pages
+  - [ ] List Page
+  - [ ] Create Page
+  - [ ] Edit Page
+  - [ ] Show Page
+  - [ ] Delete Page
