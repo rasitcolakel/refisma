@@ -1,5 +1,7 @@
 # Refisma
 
+Refisma is a tool to help you create CRUD applications by using Prisma. It generates services and endpoints for you, so you can focus on the business logic.
+
 ## Description
 
 Refisma is a tool to help you create CRUD applications by using Prisma. It generates services and endpoints for you, so you can focus on the business logic.
