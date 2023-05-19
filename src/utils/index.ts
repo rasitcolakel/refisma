@@ -132,3 +132,40 @@ export const prismaTypeToZod = (type: TPrismaScalarTypes) => {
             return 'any'
     }
 }
+
+export const mergeSameImports = (imports: string[][]) => {
+    const mergedImports: string[][] = []
+    imports.forEach((importItem) => {
+        const existingImport = mergedImports.find((item) => item[1] === importItem[1])
+        if (existingImport) {
+            existingImport[0] = `${existingImport[0]}, ${importItem[0]}`
+        } else {
+            mergedImports.push(importItem)
+        }
+    })
+    return mergedImports
+}
+
+export const fieldToFormElement = (field: Field) => {
+    const type = field.type.replace('?', '') as TPrismaScalarTypes
+
+    if (type === PrismaScalarTypes.Int) return 'number'
+    if (type === PrismaScalarTypes.String) return 'text'
+    if (type === PrismaScalarTypes.Boolean) return 'checkbox'
+    if (type === PrismaScalarTypes.DateTime) return 'date'
+    if (type === PrismaScalarTypes.Json) return 'text'
+    if (type === PrismaScalarTypes.Bytes) return 'text'
+    if (type === PrismaScalarTypes.Decimal) return 'number'
+    if (type === PrismaScalarTypes.BigInt) return 'number'
+    if (type === PrismaScalarTypes.Float) return 'number'
+    if (type === PrismaScalarTypes.Unsupported) return 'text'
+}
+
+export const fieldsToFormElements = (fields: Field[]) => {
+    return fields.map((field) => {
+        return {
+            ...field,
+            elementType: fieldToFormElement(field),
+        }
+    })
+}

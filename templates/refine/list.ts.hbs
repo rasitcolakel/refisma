@@ -1,10 +1,10 @@
-{{> imports name=name }}
+{{> imports name=name imports=imports }}
 
 export default function {{name}}List() {
     const t = useTranslate();
     const { dataGridProps } = useDataGrid<{{name}}>();
 
-    {{> columns fields=excludedModels name=name }}
+    {{> columns fields=excludedModels name=name actions=actions idField=idField }}
 
     return (
       <List canCreate>
@@ -17,4 +17,6 @@ export default function {{name}}List() {
       </List>
     );
 }
+
+{{> getServerSideProps }}
 

@@ -1,12 +1,28 @@
 const columns = React.useMemo<GridColumns<{{name}}>>(
   () => [
     {{#each fields}}
-    
-    {
-    field: '{{this.name}}',
-    headerName: t('table.{{this.name}}'),
-    } {{#unless @last}},{{/unless}}
+      {
+        field: '{{this.name}}',
+        flex: 1,
+        headerName: t('table.{{this.name}}'),
+      },
     {{/each}}
+    {{#if actions}}
+      {
+        field: 'actions',
+        headerName: t('table.actions'),
+        flex: 1,
+        renderCell: function render({ row }) {
+          return (
+            <>
+              <ShowButton hideText recordItemId={row.{{idField}} } />
+              <EditButton hideText recordItemId={row.{{idField}} } />
+              <DeleteButton hideText recordItemId={row.{{idField}} } />
+            </>
+          );
+        },
+      },
+    {{/if}}
   ],
   [t],
 );

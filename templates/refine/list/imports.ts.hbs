@@ -1,11 +1,6 @@
-import React from 'react';
-import { DataGrid, GridColumns } from '@mui/x-data-grid';
-import { {{name}} } from '@prisma/client';
-import {useTranslate } from '@refinedev/core';
-import {
-  DeleteButton,
-  EditButton,
-  List,
-  ShowButton,
-  useDataGrid,
-} from '@refinedev/mui';
+{{#each imports}}
+import {{#if this.[2]}} {{ this.[0]}} {{else}} { {{ this.[0]}} } {{/if}} from "{{this.[1]}}";
+{{/each}}
+
+  
+    

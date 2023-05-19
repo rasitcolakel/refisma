@@ -1,0 +1,34 @@
+{{> imports name=name imports=imports }}
+
+export default function {{name}}Create() {
+    const t = useTranslate();
+    const {
+        saveButtonProps,
+        refineCore: { formLoading },
+        register,
+        control,
+        formState: { errors },
+    } = useForm();
+
+    return (
+        <Create isLoading={formLoading} saveButtonProps={saveButtonProps}>
+            {{#each formFields}}
+                <TextField
+                    {...register("{{this.name}}", {
+                        required: "This field is required",
+                    })}
+                    error={!!(errors as any)?.{{this.name}} }
+                    helperText={(errors as any)?.{{this.name}}?.message}
+                    margin="normal"
+                    fullWidth
+                    type="{{this.elementType}}"
+                    label={t('table.{{this.name}}')}
+                    name="{{this.name}}"
+                />
+            {{/each}}
+        </Create>   
+    );
+}
+
+{{> getServerSideProps }}
+
