@@ -17,6 +17,12 @@ npm install -g refisma
 - [x] Next.js
 - [ ] Node.js (Express)
 
+## Supported UI Frameworks
+- [x] MaterialUI
+- [ ] ChakraUI
+- [ ] Ant Design
+- [ ] Mantine
+
 ## Upcoming Features
 
 - [x] Types will be based on the Prisma schema
@@ -34,3 +40,4 @@ npm install -g refisma
   - [ ] Edit Page
   - [ ] Show Page
   - [ ] Delete Page
+- 
