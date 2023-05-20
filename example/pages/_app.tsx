@@ -86,11 +86,11 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout): JSX.Element {
                   },
                 },
                 {
-                  name: "categories",
-                  list: "/categories",
-                  create: "/categories/create",
-                  edit: "/categories/edit/:id",
-                  show: "/categories/show/:id",
+                  name: "category",
+                  list: "/category",
+                  create: "/category/create",
+                  edit: "/category/edit/:id",
+                  show: "/category/show/:id",
                   meta: {
                     canDelete: true,
                   },
