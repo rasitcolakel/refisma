@@ -61,9 +61,12 @@ dependencies:
   react-dom:
     specifier: ^18.0.0
     version: 18.0.0(react@18.0.0)
+  react-hook-form:
+    specifier: ^7.43.9
+    version: 7.43.9(react@18.0.0)
   refisma:
-    specifier: 0.0.20
-    version: 0.0.20
+    specifier: 0.0.23
+    version: 0.0.23
   zod:
     specifier: ^3.21.4
     version: 3.21.4
@@ -5466,8 +5469,8 @@ packages:
       esprima: 4.0.1
     dev: false
 
-  /refisma@0.0.20:
-    resolution: {integrity: sha512-qoh1XKSs9rqPYrNOpASj9r2YsypdujDnB/8CRzTSyyqfg2cWCZ7xt2GQj4JVX26YN8JA4fcjLzJRt6vTTMDq4w==}
+  /refisma@0.0.23:
+    resolution: {integrity: sha512-gHXIJPWWbYNGR5g/VHzb0z6ZcKmK5w79zKFq1uf6HX34vmfwLiAU5ObbXcC1B8I5ZLEvxXjE0+LW+hmstrGiuA==}
     engines: {node: '>=12.10'}
     hasBin: true
     dependencies:

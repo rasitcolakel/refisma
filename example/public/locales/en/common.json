@@ -141,5 +141,15 @@
   },
   "table": {
     "actions": "Actions"
+  },
+  "errors": {
+    "required": {
+      "field": "'{{ field }}' is required",
+      "common": "This field is required",
+      "min": "This field must be at least {{ min }} characters",
+      "max": "This field must be at most {{ max }} characters",
+      "invalidMail": "This field must be a valid email address"
+    }
   }
 }
+
