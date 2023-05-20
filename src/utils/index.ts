@@ -1,7 +1,7 @@
 import { UIFrameworks } from '@refinedev/cli'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs'
 import path from 'path'
-import { Field } from '../types'
+import { Element, Field, FormField, Model } from '../types'
 import { PrismaScalarTypes, TPrismaScalarTypes } from '../enums'
 import { ZodModel } from '../types'
 
@@ -136,6 +136,10 @@ export const prismaTypeToZod = (type: TPrismaScalarTypes) => {
 export const mergeSameImports = (imports: string[][]) => {
     const mergedImports: string[][] = []
     imports.forEach((importItem) => {
+        if (importItem[2] === 'true') {
+            mergedImports.push(importItem)
+            return
+        }
         const existingImport = mergedImports.find((item) => item[1] === importItem[1])
         if (existingImport) {
             existingImport[0] = `${existingImport[0]}, ${importItem[0]}`
@@ -146,9 +150,9 @@ export const mergeSameImports = (imports: string[][]) => {
     return mergedImports
 }
 
-export const fieldToFormElement = (field: Field) => {
+export const fieldToFormElement = (field: Field): Element => {
     const type = field.type.replace('?', '') as TPrismaScalarTypes
-
+    if (field.relation.fields?.length) return 'autocomplete'
     if (type === PrismaScalarTypes.Int) return 'number'
     if (type === PrismaScalarTypes.String) return 'text'
     if (type === PrismaScalarTypes.Boolean) return 'checkbox'
@@ -159,13 +163,52 @@ export const fieldToFormElement = (field: Field) => {
     if (type === PrismaScalarTypes.BigInt) return 'number'
     if (type === PrismaScalarTypes.Float) return 'number'
     if (type === PrismaScalarTypes.Unsupported) return 'text'
+    return 'text'
 }
 
-export const fieldsToFormElements = (fields: Field[]) => {
+export const fieldsToFormElements = (fields: Field[]): FormField[] => {
     return fields.map((field) => {
         return {
             ...field,
             elementType: fieldToFormElement(field),
         }
     })
+}
+
+export const relationMapper = (fields: Field[], models: Model[]): Field[] => {
+    const relations = getSingleRelationFields(fields)
+    if (!relations.length) return fields
+    return fields.map((field) => {
+        const checkRelationsHasReference = relations.find(
+            (r) => r.relation && r.relation.fields && r.relation?.fields.includes(field.name),
+        )
+        if (checkRelationsHasReference) {
+            const relatedModel = models.find(
+                (m) => m.name === checkRelationsHasReference.type.replace('?', '').replace('[]', ''),
+            )
+            if (!relatedModel) return field
+            return {
+                ...field,
+                relation: { ...checkRelationsHasReference.relation, type: checkRelationsHasReference.type },
+                relatedModel,
+            }
+        }
+        return field
+    })
+}
+
+export const getSingleRelationFields = (fields: Field[]) => {
+    return fields.filter((field) => field.isRelation && !field.isList)
+}
+
+export const getAllRequiredFields = (fields: Field[]) => {
+    return fields.filter((field) => field.isRequired)
+}
+
+export const excludeIdField = (fields: Field[]) => {
+    return fields.filter((field) => !field.isId)
+}
+
+export const excludeNonRequiredFields = (fields: Field[]) => {
+    return fields.filter((field) => field.isRequired)
 }

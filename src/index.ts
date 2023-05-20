@@ -15,7 +15,6 @@ export const main = async () => {
     const selectedModels = models.filter((model) => response.model.includes(model.name))
 
     if (!selectedModels) {
-        console.log(chalk.red('No models selected'))
         process.exit(1)
     }
 

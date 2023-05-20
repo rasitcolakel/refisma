@@ -1,8 +1,9 @@
 // read models from  prisma/schema.prisma
 
 import { readFileSync } from 'fs'
-import { Field, Model } from '../types'
+import { Field, KeyOf, Model, PrismaRelationArgs } from '../types'
 import { PrismaScalarTypes, TPrismaScalarTypes } from '../enums'
+import { relationMapper } from '.'
 
 export const getModels = (): Model[] => {
     const schema = readFileSync('prisma/schema.prisma', 'utf-8')
@@ -41,6 +42,7 @@ export const parseSchema = (schema: string): Model[] => {
                 model.fields.push(field)
             }
         }
+        if (model?.fields) model.fields = relationMapper(model?.fields, models)
     }
 
     return models
@@ -51,10 +53,30 @@ const parseField = (line: string): Field => {
     const arrayLine = line.replace(/\s+/g, ' ').trim()
 
     const [name, type, ...options] = arrayLine.split(' ') as string[]
-
+    const relationOptions = arrayLine.split('@relation')[1]
+    const relation: PrismaRelationArgs = {}
+    if (relationOptions) {
+        const relationArgs = relationOptions.replace('(', '').replace(')', '').split(',')
+        relationArgs.forEach((arg) => {
+            const [key, value] = arg.split(':') as [KeyOf<PrismaRelationArgs>, string]
+            const trimmedKey = key.trim() as KeyOf<PrismaRelationArgs>
+            if (trimmedKey === 'fields') {
+                relation[trimmedKey] = value
+                    .trim()
+                    .replace('[', '')
+                    .replace(']', '')
+                    .split(',')
+                    .map((field) => field.trim())
+            } else {
+                relation[trimmedKey] = value.replace('[', '').replace(']', '').trim()
+            }
+        })
+    }
     const isList = type.endsWith('[]')
     const isRelation =
-        !PrismaScalarTypes[(isList ? type.replace('[]', '') : type.replace('?', '')) as TPrismaScalarTypes]
+        relation.fields && relation.fields.length > 0 && relation.references
+            ? true
+            : !PrismaScalarTypes[(isList ? type.replace('[]', '') : type.replace('?', '')) as TPrismaScalarTypes]
     const isRequired = !type.includes('?')
     const isUnique = options.includes('@unique')
     const isId = options.includes('@id')
@@ -69,6 +91,7 @@ const parseField = (line: string): Field => {
         type: type as TPrismaScalarTypes,
         isList,
         isRelation,
+        relation,
         isRequired,
         isUnique,
         isId,

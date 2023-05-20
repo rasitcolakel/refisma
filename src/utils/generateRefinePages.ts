@@ -3,7 +3,16 @@ import { Model, Repository } from '../types'
 import handlebars from 'handlebars'
 import prettier from 'prettier'
 import path from 'path'
-import { excludeRelationFields, fieldsToFormElements, findIdField, mergeSameImports, writeFile } from '.'
+import {
+    excludeRelationFields,
+    fieldsToFormElements,
+    findIdField,
+    getSingleRelationFields,
+    mergeSameImports,
+    writeFile,
+} from '.'
+import { generateFormFields, generateRelationFormDependencies } from './generateFormFields'
+import { UIFrameworks } from '@refinedev/cli'
 
 const refineTemplatesPath = path.join(__dirname, '../../templates/refine')
 
@@ -17,8 +26,6 @@ handlebars.registerPartial(
 )
 
 handlebars.registerHelper('isArray', function (arg1: string, options) {
-    console.log('isArray', arg1, Array.isArray(arg1))
-
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     return Array.isArray(arg1) || arg1.includes(',') ? options.fn(this) : options.inverse(this)
@@ -63,19 +70,41 @@ export const generateRefineListPage = (model: Model, templateParams: Repository)
 const createImports = (model: Model) => [
     ['React', 'react', 'true'],
     ['useTranslate', '@refinedev/core'],
+    ['HttpError', '@refinedev/core'],
     ['Create', '@refinedev/mui'],
     ['GetServerSideProps', 'next'],
     ['serverSideTranslations', 'next-i18next/serverSideTranslations'],
-    [model.name, '@prisma/client'],
     ['useForm', '@refinedev/react-hook-form'],
     ['TextField', '@mui/material'],
+    ['Controller', 'react-hook-form'],
+    ['Stack', '@mui/material'],
+    ['FormControl', '@mui/material'],
+    ['FormLabel', '@mui/material'],
+    ['Checkbox', '@mui/material'],
+    [model.name, '@prisma/client'],
 ]
 
 export const generateRefineCreatePage = (model: Model, templateParams: Repository) => {
     const template = readFileSync(path.join(refineTemplatesPath, 'create.ts.hbs'), 'utf-8')
     const templateCompiler = handlebars.compile(template)
-
+    const formFields = generateFormFields(
+        fieldsToFormElements(model.fields.filter((field) => !field.isId && !field.isRelation)),
+        model.name,
+        UIFrameworks.MUI,
+    )
     const imports = createImports(model)
+    const relations = getSingleRelationFields(model.fields)
+    const relationFields = generateRelationFormDependencies(getSingleRelationFields(relations))
+    if (relations.length > 0) {
+        imports.push(['useAutocomplete', '@refinedev/mui'])
+        imports.push(['Autocomplete', '@mui/material'])
+        imports.push(['axiosInstance', '@refinedev/simple-rest'])
+        imports.push(['dataProvider', '@refinedev/simple-rest', 'true'])
+        imports.push(['GetListResponse', '@refinedev/core'])
+        relations.forEach((f) => {
+            imports.push([f.type.replace('[]', '').replace('?', ''), '@prisma/client'])
+        })
+    }
     const compiledTemplate = prettier.format(
         templateCompiler({
             ...model,
@@ -83,7 +112,8 @@ export const generateRefineCreatePage = (model: Model, templateParams: Repositor
             actions: true,
             idField: findIdField(model.fields).name,
             imports: mergeSameImports(imports),
-            formFields: fieldsToFormElements(model.fields.filter((field) => !field.isId && !field.isRelation)),
+            formFields: formFields,
+            relationFields,
         }),
         { parser: 'typescript' },
     )

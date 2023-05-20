@@ -37,11 +37,28 @@ export type Model = {
     fields: Field[]
 }
 
+export type FormField = Field & {
+    elementType: Element
+}
+
+export type Element =
+    | 'text'
+    | 'number'
+    | 'date'
+    | 'select'
+    | 'checkbox'
+    | 'radio'
+    | 'switch'
+    | 'slider'
+    | 'autocomplete'
+
 export type Field = {
     name: string
     type: TPrismaScalarTypes
     isList: boolean
     isRelation: boolean
+    relation: PrismaRelationArgs
+    relatedModel?: Model
     isRequired: boolean
     isUnique: boolean
     isId: boolean
@@ -59,3 +76,15 @@ export type ZodModel = {
     optional: boolean
     id: boolean
 }
+
+export type PrismaRelationArgs = {
+    fields?: string[]
+    references?: string
+    name?: string
+    onDelete?: string
+    onUpdate?: string
+    map?: string
+    // custom properties
+    type?: string
+}
+export type KeyOf<T> = keyof T
