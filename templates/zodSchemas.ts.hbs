@@ -4,7 +4,7 @@ const body = z.object({
 	{{#each zodSchema}}
     	{{#if this.id}}
         {{else}}
-    	{{this.name}}: {{#ifEquals this.type "number"}}z.preprocess(Number,z.number()) {{else}}z.{{this.type}}(){{/ifEquals}}{{#if this.optional}}.optional(){{/if}}{{#unless @last}},{{/unless}} 
+    	{{this.name}}: {{#ifEquals this.type "number"}}z.preprocess(Number,z.number()) {{else}} {{#ifEquals this.type "boolean"}} z.preprocess(Boolean,z.boolean()) {{else}} z.{{this.type}}(){{/ifEquals}} {{/ifEquals}} {{#if this.optional}}.optional(){{/if}}{{#unless @last}},{{/unless}} 
         {{/if}}
     {{/each}}
 })
@@ -12,7 +12,7 @@ const body = z.object({
 const query = z.object({
 	{{#each zodSchema}}
     	{{#if this.id}}
-    	{{this.name}}: {{#ifEquals this.type "number"}}z.preprocess(Number,z.number()) {{else}}z.{{this.type}}(){{/ifEquals}}{{#if this.optional}}.optional(){{/if}}{{#unless @last}},{{/unless}} 
+    	{{this.name}}: {{#ifEquals this.type "number"}}z.preprocess(Number,z.number()) {{else}} {{#ifEquals this.type "boolean"}} z.preprocess(Boolean,z.boolean()) {{else}} z.{{this.type}}(){{/ifEquals}} {{/ifEquals}} {{#if this.optional}}.optional(){{/if}}{{#unless @last}},{{/unless}} 
         {{/if}}
     {{/each}}
 })

@@ -1,7 +1,15 @@
 export const getServerSideProps: GetServerSideProps = async (context) => {
+  {{#each initialResources}}
+  const {{this.name}} = await dataProvider(process.env.NEXT_PUBLIC_SERVER_API_URL as string, axiosInstance).getList({
+    resource: "{{this.resource}}"
+  });
+  {{/each}}
   return {
     props: {
       ...(await serverSideTranslations(context.locale ?? 'en', ['common'])),
+    {{#each initialResources}}
+      {{this.name}},
+    {{/each}}
     },
   };
 };

@@ -1,6 +1,16 @@
 {{> imports name=name imports=imports }}
 
-export default function {{name}}Create() {
+interface Props {
+    {{#each relationFields.[0]}}
+        {{{this.type}}};
+    {{/each}}
+}
+
+export default function {{name}}Create({
+    {{#each relationFields.[0]}}
+        {{{this.name}}} {{#unless @last}},{{/unless}}
+    {{/each}} 
+}:Props) {
     const t = useTranslate();
     const {
         saveButtonProps,
@@ -8,27 +18,16 @@ export default function {{name}}Create() {
         register,
         control,
         formState: { errors },
-    } = useForm();
+    } = useForm<{{name}}, HttpError>();
+
+    {{{relationFields.[1]}}}
 
     return (
         <Create isLoading={formLoading} saveButtonProps={saveButtonProps}>
-            {{#each formFields}}
-                <TextField
-                    {...register("{{this.name}}", {
-                        required: "This field is required",
-                    })}
-                    error={!!(errors as any)?.{{this.name}} }
-                    helperText={(errors as any)?.{{this.name}}?.message}
-                    margin="normal"
-                    fullWidth
-                    type="{{this.elementType}}"
-                    label={t('table.{{this.name}}')}
-                    name="{{this.name}}"
-                />
-            {{/each}}
+            {{{formFields}}}
         </Create>   
     );
 }
 
-{{> getServerSideProps }}
+{{> getServerSideProps initialResources=relationFields.[0]  }}
 
