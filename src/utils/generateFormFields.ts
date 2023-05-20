@@ -1,6 +1,7 @@
 import { UIFrameworks } from '@refinedev/cli'
 import { Field, FormField, Model } from '../types'
 import { excludeIdField, excludeNonRequiredFields, excludeRelationFields, findIdField, getAllRequiredFields } from '.'
+import { PrismaScalarTypes } from '../enums'
 
 export const generateFormFields = (fields: FormField[], modelName: string, framework: UIFrameworks) => {
     switch (framework) {
@@ -27,12 +28,13 @@ export const generateRelationFormDependencies = (fields: Field[]) => {
     const autocompleteOptions = fields.map((field) => {
         const name = (field?.relation?.fields && field?.relation?.fields[0]) || ''
         const type = field.type.replace('[]', '').replace('?', '')
-        const resource = field.type.replace('[]', '').replace('?', '').toLowerCase()
+        const resourceUpper = field.type.replace('[]', '').replace('?', '')
+        const resource = resourceUpper.toLowerCase()
         props.push({ type: `${name}Data: GetListResponse<${type}>`, name: `${name}Data`, resource })
         return `const {
             autocompleteProps: ${name}AutocompleteProps,
             queryResult: ${name}QueryResult,
-          } = useAutocomplete<User>({
+          } = useAutocomplete<${resourceUpper}>({
             queryOptions: {
               initialData: ${name}Data,
             },
@@ -76,11 +78,23 @@ function generateMUIFormFields(fields: FormField[], modelName: string) {
                 return
             }
             const relationModel = field.relatedModel.name.replace('[]', '').replace('?', '')
-            const idField = findIdField(field.relatedModel?.fields).name
+            const idField = findIdField(field.relatedModel?.fields)
             const excludes = getAllRequiredFields(
                 excludeRelationFields(excludeNonRequiredFields(excludeIdField(field.relatedModel.fields))),
             )
-            const optionKey = excludes[0].name || idField
+            let optionKey = idField.name
+            if (excludes.length > 0) {
+                optionKey = excludes[0].name
+            } else {
+                if (
+                    idField.type === PrismaScalarTypes.Int ||
+                    idField.type === PrismaScalarTypes.Float ||
+                    idField.type === PrismaScalarTypes.Decimal
+                ) {
+                    optionKey += '.toString()'
+                }
+            }
+
             items.push(
                 insideOfController(
                     field,
@@ -89,7 +103,7 @@ function generateMUIFormFields(fields: FormField[], modelName: string) {
                             {...${field.name}AutocompleteProps}
                             onChange={(_, value: ${relationModel}| null) => {
                                 if (value) {
-                                  field.onChange(value.${idField});
+                                  field.onChange(value.${idField.name});
                                 }
                             }}
                             getOptionLabel={(option) => option.${optionKey}}

@@ -42,10 +42,14 @@ export const parseSchema = (schema: string): Model[] => {
                 model.fields.push(field)
             }
         }
-        if (model?.fields) model.fields = relationMapper(model?.fields, models)
     }
 
-    return models
+    return models.map((model) => {
+        return {
+            ...model,
+            fields: [...relationMapper(model.fields, models)],
+        }
+    })
 }
 
 const parseField = (line: string): Field => {
