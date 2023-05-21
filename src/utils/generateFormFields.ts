@@ -3,10 +3,15 @@ import { Field, FormField, Model } from '../types'
 import { excludeIdField, excludeNonRequiredFields, excludeRelationFields, findIdField, getAllRequiredFields } from '.'
 import { PrismaScalarTypes } from '../enums'
 
-export const generateFormFields = (fields: FormField[], modelName: string, framework: UIFrameworks) => {
+export const generateFormFields = (
+    fields: FormField[],
+    model: Model,
+    framework: UIFrameworks,
+    type: 'edit' | 'create' = 'create',
+) => {
     switch (framework) {
         case UIFrameworks.MUI:
-            return '<Stack gap="24px">' + generateMUIFormFields(fields, modelName) + '</Stack>'
+            return '<Stack gap="24px">' + generateMUIFormFields(fields, model, type) + '</Stack>'
         // case UIFrameworks.ANTD:
         //     return generateAntDFormFields(fields);
         // case UIFrameworks.CHAKRA:
@@ -18,11 +23,18 @@ export const generateFormFields = (fields: FormField[], modelName: string, frame
     }
 }
 
-export const generateRelationFormDependencies = (fields: Field[]) => {
+export const generateRelationFormDependencies = (
+    fields: Field[],
+    type: 'create' | 'edit' = 'create',
+    model: Model | undefined = undefined,
+) => {
     const props: {
         type: string
         name: string
         resource: string
+        function: string
+        id?: string
+        idFrom?: string
     }[] = []
 
     const autocompleteOptions = fields.map((field) => {
@@ -30,7 +42,12 @@ export const generateRelationFormDependencies = (fields: Field[]) => {
         const type = field.type.replace('[]', '').replace('?', '')
         const resourceUpper = field.type.replace('[]', '').replace('?', '')
         const resource = resourceUpper.toLowerCase()
-        props.push({ type: `${name}Data: GetListResponse<${type}>`, name: `${name}Data`, resource })
+        props.push({
+            type: `${name}Data: GetListResponse<${type}>`,
+            name: `${name}Data`,
+            resource,
+            function: 'getList',
+        })
         return `const {
             autocompleteProps: ${name}AutocompleteProps,
             queryResult: ${name}QueryResult,
@@ -51,11 +68,25 @@ export const generateRelationFormDependencies = (fields: Field[]) => {
         `
     })
 
+    if (type === 'edit' && model) {
+        const idField = findIdField(model.fields)
+        props.push({
+            type: `${idField.name}Data: GetOneResponse<${model.name}>`,
+            name: `${idField.name}Data`,
+            resource: model.name.toLowerCase(),
+            function: 'getOne',
+            id: idField.name,
+            idFrom: 'context.params?.id as string',
+        })
+    }
+
     return [props, autocompleteOptions.join('')]
 }
 
-function generateMUIFormFields(fields: FormField[], modelName: string) {
+function generateMUIFormFields(fields: FormField[], model: Model, type: 'create' | 'edit' = 'create') {
     const items = []
+    const idFieldOfModel = findIdField(model.fields)
+
     for (const field of fields) {
         if (field.elementType === 'text' || field.elementType === 'number') {
             items.push(
@@ -118,6 +149,11 @@ function generateMUIFormFields(fields: FormField[], modelName: string) {
                                     variant="outlined"
                                 />
                             )}
+                            ${
+                                type === 'edit'
+                                    ? `defaultValue={${field.name}AutocompleteProps.options.find(o=>o.id===${idFieldOfModel.name}Data?.data.${field.name})}`
+                                    : ''
+                            }
                         />`,
                 ),
             )
@@ -128,8 +164,11 @@ function generateMUIFormFields(fields: FormField[], modelName: string) {
                     `<Checkbox
                             ${commonFieldProps(field)}
                             color="primary"
-
-
+                            ${
+                                type === 'edit'
+                                    ? `checked={${idFieldOfModel.name}Data?.data.${field.name} || false}`
+                                    : ''
+                            }
                         />`,
                 ),
             )
