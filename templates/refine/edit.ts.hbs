@@ -1,0 +1,39 @@
+{{> imports name=name imports=imports }}
+
+interface Props {
+    {{#each relationFields.[0]}}
+        {{{this.type}}};
+    {{/each}}
+}
+
+export default function {{name}}Create({
+    {{#each relationFields.[0]}}
+        {{{this.name}}} {{#unless @last}},{{/unless}}
+    {{/each}} 
+}:Props) {
+    const t = useTranslate();
+    const {
+        saveButtonProps,
+        refineCore: { formLoading },
+        register,
+        control,
+        formState: { errors },
+    } = useForm<{{name}}, HttpError>({
+        refineCoreProps: {
+            queryOptions: {
+                initialData: {{idField}}Data
+            },
+        },
+    });
+
+    {{{relationFields.[1]}}}
+
+    return (
+        <Edit isLoading={formLoading} saveButtonProps={saveButtonProps}>
+            {{{formFields}}}
+        </Edit>   
+    );
+}
+
+{{> getServerSideProps initialResources=relationFields.[0]  }}
+
