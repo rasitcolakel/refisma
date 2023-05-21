@@ -137,12 +137,11 @@ export const generateRefineEditPage = (model: Model, templateParams: Repository)
 
     imports.push(['GetOneResponse', '@refinedev/core'])
     imports.push(['Edit', '@refinedev/mui'])
-
+    imports.push(['axiosInstance', '@refinedev/simple-rest'])
+    imports.push(['dataProvider', '@refinedev/simple-rest', 'true'])
     if (relations.length > 0) {
         imports.push(['useAutocomplete', '@refinedev/mui'])
         imports.push(['Autocomplete', '@mui/material'])
-        imports.push(['axiosInstance', '@refinedev/simple-rest'])
-        imports.push(['dataProvider', '@refinedev/simple-rest', 'true'])
         imports.push(['GetListResponse', '@refinedev/core'])
         relations.forEach((f) => {
             imports.push([f.type.replace('[]', '').replace('?', ''), '@prisma/client'])
@@ -160,7 +159,7 @@ export const generateRefineEditPage = (model: Model, templateParams: Repository)
         }),
         { parser: 'typescript' },
     )
-    writeFile(`pages/${model.name.toLowerCase()}/edit/index.tsx`, compiledTemplate)
+    writeFile(`pages/${model.name.toLowerCase()}/edit/[id].tsx`, compiledTemplate)
 
     return compiledTemplate
 }
