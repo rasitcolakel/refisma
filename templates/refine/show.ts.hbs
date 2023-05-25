@@ -1,0 +1,35 @@
+{{> imports name=name imports=imports }}
+
+interface Props {
+    {{#each initialResources}}
+        {{{this.type}}};
+    {{/each}}
+}
+
+export default function {{name}}Create({
+    {{#each initialResources}}
+        {{{this.name}}} {{#unless @last}},{{/unless}}
+    {{/each}} 
+}:Props) {
+    const { queryResult } = useShow<{{name}}>({
+        resource: "users",
+        queryOptions: {
+            initialData : {{idField}}Data
+        }
+    });
+    const { data, isLoading } = queryResult;
+
+    const record = data?.data;
+
+
+    return (
+        <Show isLoading={isLoading}>
+            <Stack gap={1}>
+                {{> renderShow fields=fields }}
+            </Stack>
+        </Show>
+    );
+}
+
+{{> getServerSideProps initialResources=initialResources }}
+
