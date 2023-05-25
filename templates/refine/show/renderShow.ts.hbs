@@ -1,0 +1,8 @@
+{{#each fields}}
+<Typography variant="body1" fontWeight="bold" key="{{@root.name}}-{{this.name}}">
+    {t('table.{{this.name}}')} 
+</Typography>
+<Typography>
+    {record?.{{this.showName}} }
+</Typography>
+{{/each}}

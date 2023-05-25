@@ -5,6 +5,18 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     {{#if this.id}} {{this.id}}: context.query.id as string, {{/if}}
   });
   {{/each}}
+
+
+  {{#each initialResources}}
+    {{#if this.id}}
+    if (!{{this.name}}.data) {
+      return {
+        notFound: true,
+      };
+    }
+    {{/if}}
+  {{/each}}
+
   return {
     props: {
       ...(await serverSideTranslations(context.locale ?? 'en', ['common'])),

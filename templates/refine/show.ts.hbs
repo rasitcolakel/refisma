@@ -11,8 +11,9 @@ export default function {{name}}Create({
         {{{this.name}}} {{#unless @last}},{{/unless}}
     {{/each}} 
 }:Props) {
-    const { queryResult } = useShow<{{name}}>({
-        resource: "users",
+    const t = useTranslate();
+    const { queryResult } = useShow<{{name}}Select>({
+        resource: "{{lowercasedName}}",
         queryOptions: {
             initialData : {{idField}}Data
         }
@@ -25,7 +26,7 @@ export default function {{name}}Create({
     return (
         <Show isLoading={isLoading}>
             <Stack gap={1}>
-                {{> renderShow fields=fields }}
+                {{> renderShow fields=fields name=name }}
             </Stack>
         </Show>
     );

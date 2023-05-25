@@ -4,6 +4,17 @@ const prisma= new PrismaClient();
 const model= prisma.{{lowercasedName}};
 
 
+const {{lowercasedName}} = Prisma.validator<Prisma.{{name}}Args>()({
+    select: {
+        {{#each fields}}
+        {{this.name}}: true,
+        {{/each}}
+    }
+})
+
+export type {{name}}Select = Prisma.{{name}}GetPayload<typeof {{lowercasedName}}>
+const select = {{lowercasedName}}.select;
+
 {{#each methods}}
 export const {{this.name}}{{@root.name}} = async ({{#each params}} {{this.name}}: {{this.type}}{{#unless @last}},{{/unless}}{{/each}}) => {
     const result = await model.{{#if this.customName}}{{this.customName}}{{else}}{{this.name}}{{/if}}({{#if this.requestParams}}{    
@@ -11,13 +22,14 @@ export const {{this.name}}{{@root.name}} = async ({{#each params}} {{this.name}}
         {{#if this.as}} {{this.as}} {{else}} {{this.name}}{{/if}}: 
         {{#if this.values}}
             {{#each this.values}}{
-                {{this.name}}{{#unless @last}},{{/unless}}
+                {{this.name}},
             },
             {{/each}}
         {{else}}
-            {{this.name}}{{#unless @last}},{{/unless}}
+            {{this.name}},
         {{/if}}
         {{/each}} 
+            select,
     }{{/if}});
 
     return result;
