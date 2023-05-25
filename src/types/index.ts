@@ -30,6 +30,7 @@ export type Repository = {
         }[]
     }[]
     zodSchema?: ZodModel[]
+    fields?: Field[]
 }
 
 export type Model = {
@@ -54,6 +55,7 @@ export type Element =
 
 export type Field = {
     name: string
+    showName?: string
     type: TPrismaScalarTypes
     isList: boolean
     isRelation: boolean

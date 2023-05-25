@@ -7,11 +7,12 @@ import {
     excludeRelationFields,
     fieldsToFormElements,
     findIdField,
+    generateShowFields,
     getSingleRelationFields,
     mergeSameImports,
     writeFile,
 } from '.'
-import { generateFormFields, generateRelationFormDependencies } from './generateFormFields'
+import { generateFormFields, generateRelationFormDependencies, generateShowProps } from './generateFormFields'
 import { UIFrameworks } from '@refinedev/cli'
 
 const refineTemplatesPath = path.join(__dirname, '../../templates/refine')
@@ -23,6 +24,11 @@ handlebars.registerPartial('imports', readFileSync(path.join(refineTemplatesPath
 handlebars.registerPartial(
     'getServerSideProps',
     readFileSync(path.join(refineTemplatesPath, '/common/getServerSideProps.ts.hbs'), 'utf-8'),
+)
+
+handlebars.registerPartial(
+    'renderShow',
+    readFileSync(path.join(refineTemplatesPath, '/show/renderShow.ts.hbs'), 'utf-8'),
 )
 
 handlebars.registerHelper('isArray', function (arg1: string, options) {
@@ -160,6 +166,49 @@ export const generateRefineEditPage = (model: Model, templateParams: Repository)
         { parser: 'typescript' },
     )
     writeFile(`pages/${model.name.toLowerCase()}/edit/[id].tsx`, compiledTemplate)
+
+    return compiledTemplate
+}
+
+const showImports = (model: Model) => [
+    ['React', 'react', 'true'],
+    ['useTranslate', '@refinedev/core'],
+    ['GetServerSideProps', 'next'],
+    ['serverSideTranslations', 'next-i18next/serverSideTranslations'],
+    ['useShow', '@refinedev/core'],
+    ['Show', '@refinedev/mui'],
+    ['Stack', '@mui/material'],
+    ['Typography', '@mui/material'],
+    [`${model.name}Select`, `@services/${model.name}Service`],
+]
+
+export const generateRefineShowPage = (model: Model, templateParams: Repository) => {
+    const template = readFileSync(path.join(refineTemplatesPath, 'show.ts.hbs'), 'utf-8')
+    const templateCompiler = handlebars.compile(template)
+    const formFields = generateFormFields(
+        fieldsToFormElements(model.fields.filter((field) => !field.isId && !field.isRelation)),
+        model,
+        UIFrameworks.MUI,
+    )
+    const imports = showImports(model)
+    const initialResources = generateShowProps(model.fields, model)
+    imports.push(['GetOneResponse', '@refinedev/core'])
+    imports.push(['axiosInstance', '@refinedev/simple-rest'])
+    imports.push(['dataProvider', '@refinedev/simple-rest', 'true'])
+    const compiledTemplate = prettier.format(
+        templateCompiler({
+            ...model,
+            lowercasedName: model.name.charAt(0).toLowerCase() + model.name.slice(1),
+            fields: generateShowFields(model.fields),
+            actions: true,
+            idField: findIdField(model.fields).name,
+            imports: mergeSameImports(imports),
+            formFields: formFields,
+            initialResources,
+        }),
+        { parser: 'typescript' },
+    )
+    writeFile(`pages/${model.name.toLowerCase()}/show/[id].tsx`, compiledTemplate)
 
     return compiledTemplate
 }

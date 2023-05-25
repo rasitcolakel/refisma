@@ -7,7 +7,12 @@ import prettier from 'prettier'
 import { MethodNames } from '../enums'
 import { generateApiFile } from './generateApiFiles'
 import { generateZodFile } from './generateZodSChemas'
-import { generateRefineCreatePage, generateRefineEditPage, generateRefineListPage } from './generateRefinePages'
+import {
+    generateRefineCreatePage,
+    generateRefineEditPage,
+    generateRefineListPage,
+    generateRefineShowPage,
+} from './generateRefinePages'
 export const generateService = (model: Model) => {
     const template = readFileSync(path.join(__dirname, '../../templates', 'service.ts.hbs'), 'utf-8')
     const templateCompiler = handlebars.compile(template)
@@ -137,6 +142,7 @@ export const generateService = (model: Model) => {
                 ],
             },
         ],
+        fields: { ...model.fields },
         zodSchema: generateZodSchema(model.fields),
     }
     const compiledTemplate = prettier.format(templateCompiler(templateParams), { parser: 'typescript' })
@@ -164,6 +170,7 @@ export const generateService = (model: Model) => {
     generateRefineListPage(model, templateParams)
     generateRefineCreatePage(model, templateParams)
     generateRefineEditPage(model, templateParams)
+    generateRefineShowPage(model, templateParams)
 
     return templateCompiler
 }

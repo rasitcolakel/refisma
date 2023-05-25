@@ -66,6 +66,9 @@ export const getFieldByName = (fields: Field[], name: string) => {
     return fields.find((field) => field.name === name)
 }
 
+export const getFieldByType = (fields: Field[], type: string) => {
+    return fields.find((field) => field.type === type)
+}
 export const getFieldType = (field: Field): TPrismaScalarTypes | undefined => {
     if (field.type && PrismaScalarTypes[field.type]) {
         return field.type
@@ -107,6 +110,57 @@ export const generateZodSchema = (fields: Field[]): ZodModel[] => {
 
 export const excludeRelationFields = (fields: Field[]): Field[] => {
     return fields.filter((field) => !field.isList && !field.isRelation)
+}
+
+export const generateShowFields = (fields: Field[]): Field[] => {
+    const excludeFields: string[] = []
+    console.log(
+        'fields',
+        fields.map((field) => field.name),
+    )
+    const _fields = fields.map((field) => {
+        if (field.isList && field.isRelation) {
+            excludeFields.push(field.name)
+            return field
+        }
+        if (field.relation && field.relatedModel) {
+            let newName = ''
+            if (field.relation.type) {
+                excludeFields.push(field.relation.type?.toLowerCase().replace('?', '').replace('[]', ''))
+                const fieldByType = getFieldByType(fields, field.relation.type)
+                if (fieldByType) {
+                    newName += fieldByType.name
+                    excludeFields.push(fieldByType.name)
+                }
+            } else {
+                newName += field.relatedModel.name.toLowerCase()
+            }
+
+            const isRelationOptional = field.relation.type?.includes('?')
+            const requiredFields = excludeIdField(
+                excludeRelationFields(getAllRequiredFields(field.relatedModel.fields)),
+            )
+
+            if (isRelationOptional) {
+                newName += '?'
+            }
+
+            if (requiredFields.length) {
+                newName += '.' + requiredFields[0].name
+            } else {
+                const id = getIdField(field.relatedModel.fields)
+                if (id) {
+                    newName += '.' + id.name
+                }
+            }
+            field.showName = newName
+        } else {
+            field.showName = field.name
+        }
+
+        return field
+    })
+    return _fields.filter((field) => !excludeFields.includes(field.name))
 }
 
 export const prismaTypeToZod = (type: TPrismaScalarTypes) => {
@@ -207,6 +261,10 @@ export const getAllRequiredFields = (fields: Field[]) => {
 
 export const excludeIdField = (fields: Field[]) => {
     return fields.filter((field) => !field.isId)
+}
+
+export const getIdField = (fields: Field[]) => {
+    return fields.find((field) => field.isId)
 }
 
 export const excludeNonRequiredFields = (fields: Field[]) => {

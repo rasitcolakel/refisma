@@ -23,19 +23,37 @@ export const generateFormFields = (
     }
 }
 
+type NextPropsType = {
+    type: string
+    name: string
+    resource: string
+    function: string
+    id?: string
+    idFrom?: string
+}
+
+export const generateShowProps = (fields: Field[], model: Model): NextPropsType[] => {
+    const props: NextPropsType[] = []
+
+    const idField = findIdField(model.fields)
+    props.push({
+        type: `${idField.name}Data: GetOneResponse<${model.name}Select>`,
+        name: `${idField.name}Data`,
+        resource: model.name.toLowerCase(),
+        function: 'getOne',
+        id: idField.name,
+        idFrom: 'context.params?.id as string',
+    })
+
+    return props
+}
+
 export const generateRelationFormDependencies = (
     fields: Field[],
     type: 'create' | 'edit' = 'create',
     model: Model | undefined = undefined,
 ) => {
-    const props: {
-        type: string
-        name: string
-        resource: string
-        function: string
-        id?: string
-        idFrom?: string
-    }[] = []
+    const props: NextPropsType[] = []
 
     const autocompleteOptions = fields.map((field) => {
         const name = (field?.relation?.fields && field?.relation?.fields[0]) || ''
