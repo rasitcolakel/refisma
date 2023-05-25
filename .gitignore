@@ -7,3 +7,7 @@ prisma
 services/
 pages/
 schemas/
+!example/pages/
+!example/services/
+!example/schemas/
+!example/schemas/
