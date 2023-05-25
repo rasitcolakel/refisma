@@ -11,3 +11,4 @@ schemas/
 !example/services/
 !example/schemas/
 !example/schemas/
+!example/prisma/

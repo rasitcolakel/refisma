@@ -31,7 +31,7 @@
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-hook-form": "^7.43.9",
-    "refisma": "0.0.25",
+    "refisma": "0.0.27",
     "zod": "^3.21.4"
   },
   "devDependencies": {
