@@ -114,10 +114,7 @@ export const excludeRelationFields = (fields: Field[]): Field[] => {
 
 export const generateShowFields = (fields: Field[]): Field[] => {
     const excludeFields: string[] = []
-    console.log(
-        'fields',
-        fields.map((field) => field.name),
-    )
+
     const _fields = fields.map((field) => {
         if (field.isList && field.isRelation) {
             excludeFields.push(field.name)
