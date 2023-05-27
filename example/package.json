@@ -25,6 +25,7 @@
     "@refinedev/nextjs-router": "^5.1.4",
     "@refinedev/react-hook-form": "^4.1.2",
     "@refinedev/simple-rest": "^4.0.0",
+    "client@latest": "link:prisma/client@latest",
     "next": "^13.0.6",
     "next-i18next": "^8.9.0",
     "nookies": "^2.5.2",
@@ -40,7 +41,7 @@
     "@types/react-dom": "^18.0.0",
     "@typescript-eslint/parser": "5.48.0",
     "cross-env": "^7.0.3",
-    "prisma": "^4.13.0",
+    "prisma": "^4.14.1",
     "typescript": "^4.7.4"
   }
 }
