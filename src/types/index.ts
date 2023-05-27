@@ -69,6 +69,7 @@ export type Field = {
     isOptional: boolean
     isReadOnly: boolean
     isGenerated: boolean
+    isMainRelation?: boolean
 }
 
 export type ZodModel = {

@@ -22,6 +22,12 @@ handlebars.registerHelper('ifOr' as any, function (arg1, arg2, options) {
     return arg1 || arg2 ? options.fn(this) : options.inverse(this)
 })
 
+handlebars.registerHelper('ifNot' as any, function (arg1, arg2, options) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    return !arg1 ? options.fn(this) : options.inverse(this)
+})
+
 handlebars.registerHelper('ifAnd' as any, function (arg1, arg2, options) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore

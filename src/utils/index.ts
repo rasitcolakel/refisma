@@ -227,7 +227,7 @@ export const fieldsToFormElements = (fields: Field[]): FormField[] => {
 }
 
 export const relationMapper = (fields: Field[], models: Model[]): Field[] => {
-    const relations = getSingleRelationFields(fields)
+    const relations = getAllRelations(fields)
     if (!relations.length) return fields
     return fields.map((field) => {
         const checkRelationsHasReference = relations.find(
@@ -247,10 +247,12 @@ export const relationMapper = (fields: Field[], models: Model[]): Field[] => {
             const type = field.type.replace('?', '').replace('[]', '') as TPrismaScalarTypes
             if (!PrismaScalarTypes[type]) {
                 const relatedModel = models.find((m) => m.name === type)
-                if (!relatedModel) return field
+                const relationReference = relations.find((r) => r.name === field.name)
+                if (!relatedModel || !relationReference) return field
+
                 return {
                     ...field,
-                    relation: { type: field.type },
+                    relation: { ...relationReference.relation, type: field.type },
                     relatedModel,
                     isMainRelation: true,
                 }
@@ -262,6 +264,14 @@ export const relationMapper = (fields: Field[], models: Model[]): Field[] => {
 
 export const getSingleRelationFields = (fields: Field[]) => {
     return fields.filter((field) => field.isRelation && !field.isList)
+}
+
+export const getMultipleRelationFields = (fields: Field[]) => {
+    return fields.filter((field) => field.isRelation && field.isList)
+}
+
+export const getAllRelations = (fields: Field[]) => {
+    return fields.filter((field) => field.isRelation)
 }
 
 export const getAllRequiredFields = (fields: Field[]) => {
