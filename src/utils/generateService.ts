@@ -1,4 +1,4 @@
-import { findIdField, generateZodSchema, getFieldType, prismaTypeToTS, writeFile } from './../utils'
+import { findIdField, generateZodSchema, prismaTypeToTS, writeFile } from './../utils'
 import { readFileSync } from 'fs'
 import handlebars from 'handlebars'
 import path from 'path'
@@ -13,6 +13,27 @@ import {
     generateRefineListPage,
     generateRefineShowPage,
 } from './generateRefinePages'
+
+// create or for if statements in handlebars
+
+handlebars.registerHelper('ifOr' as any, function (arg1, arg2, options) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    return arg1 || arg2 ? options.fn(this) : options.inverse(this)
+})
+
+handlebars.registerHelper('ifAnd' as any, function (arg1, arg2, options) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    return arg1 && arg2 ? options.fn(this) : options.inverse(this)
+})
+
+handlebars.registerHelper('ifAndNot' as any, function (arg1, arg2, options) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    return !arg1 && !arg2 ? options.fn(this) : options.inverse(this)
+})
+
 export const generateService = (model: Model) => {
     const template = readFileSync(path.join(__dirname, '../../templates', 'service.ts.hbs'), 'utf-8')
     const templateCompiler = handlebars.compile(template)
@@ -143,6 +164,7 @@ export const generateService = (model: Model) => {
             },
         ],
         fields: { ...model.fields },
+        getCounts: model.fields.filter((field) => field.isList).map((field) => field.name).length > 0,
         zodSchema: generateZodSchema(model.fields),
     }
     const compiledTemplate = prettier.format(templateCompiler(templateParams), { parser: 'typescript' })

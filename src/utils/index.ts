@@ -203,7 +203,7 @@ export const mergeSameImports = (imports: string[][]) => {
 
 export const fieldToFormElement = (field: Field): Element => {
     const type = field.type.replace('?', '') as TPrismaScalarTypes
-    if (field.relation.fields?.length) return 'autocomplete'
+    if (field.relation && field.relation.fields?.length) return 'autocomplete'
     if (type === PrismaScalarTypes.Int) return 'number'
     if (type === PrismaScalarTypes.String) return 'text'
     if (type === PrismaScalarTypes.Boolean) return 'checkbox'
@@ -243,8 +243,20 @@ export const relationMapper = (fields: Field[], models: Model[]): Field[] => {
                 relation: { ...checkRelationsHasReference.relation, type: checkRelationsHasReference.type },
                 relatedModel,
             }
+        } else {
+            const type = field.type.replace('?', '').replace('[]', '') as TPrismaScalarTypes
+            if (!PrismaScalarTypes[type]) {
+                const relatedModel = models.find((m) => m.name === type)
+                if (!relatedModel) return field
+                return {
+                    ...field,
+                    relation: { type: field.type },
+                    relatedModel,
+                    isMainRelation: true,
+                }
+            }
+            return field
         }
-        return field
     })
 }
 

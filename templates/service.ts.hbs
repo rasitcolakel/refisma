@@ -7,8 +7,37 @@ const model= prisma.{{lowercasedName}};
 const {{lowercasedName}} = Prisma.validator<Prisma.{{name}}Args>()({
     select: {
         {{#each fields}}
-        {{this.name}}: true,
+            {{#ifAnd this.relatedModel this.isMainRelation}} 
+                {{#if this.relation}}
+                    {{#unless this.isList}}
+                        {{this.name}}: { 
+                            select:{
+                                {{#each this.relatedModel.fields}} 
+                                    {{#ifAndNot this.isRelation this.isList}}
+                                            {{this.name}}: true,
+                                    {{/ifAndNot}}
+                                {{/each}} 
+                            }
+                        }, 
+                    {{/unless}}
+                {{/if}}
+            {{else}}
+                {{#ifAndNot this.isRelation this.isList}}
+                        {{this.name}}: true,
+                {{/ifAndNot}}
+            {{/ifAnd}}
         {{/each}}
+        {{#if @root.getCounts}}
+            _count: {
+                select: {
+                {{#each fields}}
+                    {{#ifAnd this.isRelation this.isList}}
+                        {{this.name}}: true, 
+                    {{/ifAnd}}
+                {{/each}}
+                }
+            }
+        {{/if}}
     }
 })
 
@@ -30,7 +59,7 @@ export const {{this.name}}{{@root.name}} = async ({{#each params}} {{this.name}}
         {{/if}}
         {{/each}} 
             select,
-    }{{/if}});
+    }{{else}}{select}{{/if}});
 
     return result;
 

@@ -1,5 +1,4 @@
-import { type } from 'os'
-import { PrismaScalarTypes, TMethodNames, TPrismaScalarTypes } from '../enums'
+import { TMethodNames, TPrismaScalarTypes } from '../enums'
 
 export type Endpoint = {
     method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
@@ -30,6 +29,7 @@ export type Repository = {
         }[]
     }[]
     zodSchema?: ZodModel[]
+    getCounts?: boolean
     fields?: Field[]
 }
 
