@@ -9,9 +9,21 @@ const post = Prisma.validator<Prisma.PostArgs>()({
     title: true,
     content: true,
     published: true,
-    author: true,
+    author: {
+      select: {
+        id: true,
+        email: true,
+        name: true,
+      },
+    },
     authorId: true,
-    category: true,
+    category: {
+      select: {
+        id: true,
+        name: true,
+        authorId: true,
+      },
+    },
     categoryId: true,
   },
 });
@@ -38,7 +50,7 @@ export const getByIdPost = async (id: number) => {
   return result;
 };
 export const findManyPost = async () => {
-  const result = await model.findMany();
+  const result = await model.findMany({ select });
 
   return result;
 };

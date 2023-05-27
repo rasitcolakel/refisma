@@ -35,6 +35,10 @@ export default function CategoryCreate({ idData }: Props) {
           {t("table.name")}
         </Typography>
         <Typography>{record?.name}</Typography>
+        <Typography variant="body1" fontWeight="bold" key="Category-authorId">
+          {t("table.authorId")}
+        </Typography>
+        <Typography>{record?.author?.email}</Typography>
       </Stack>
     </Show>
   );

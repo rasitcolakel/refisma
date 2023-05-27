@@ -1,5 +1,5 @@
 import React from "react";
-import { useTranslate, HttpError } from "@refinedev/core";
+import { useTranslate, HttpError, GetListResponse } from "@refinedev/core";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useForm } from "@refinedev/react-hook-form";
@@ -9,14 +9,19 @@ import {
   FormControl,
   FormLabel,
   Checkbox,
+  Autocomplete,
 } from "@mui/material";
 import { Controller } from "react-hook-form";
-import { Category } from "@prisma/client";
-import { Create } from "@refinedev/mui";
+import { Category, User } from "@prisma/client";
+import { Create, useAutocomplete } from "@refinedev/mui";
+import { axiosInstance } from "@refinedev/simple-rest";
+import dataProvider from "@refinedev/simple-rest";
 
-interface Props {}
+interface Props {
+  authorIdData: GetListResponse<User>;
+}
 
-export default function CategoryCreate({}: Props) {
+export default function CategoryCreate({ authorIdData }: Props) {
   const t = useTranslate();
   const {
     saveButtonProps,
@@ -25,6 +30,24 @@ export default function CategoryCreate({}: Props) {
     control,
     formState: { errors },
   } = useForm<Category, HttpError>();
+
+  const {
+    autocompleteProps: authorIdAutocompleteProps,
+    queryResult: authorIdQueryResult,
+  } = useAutocomplete<User>({
+    queryOptions: {
+      initialData: authorIdData,
+    },
+    resource: "user",
+    liveMode: "auto",
+    onSearch: (value: string) => [
+      {
+        field: "search",
+        operator: "eq",
+        value,
+      },
+    ],
+  });
 
   return (
     <Create isLoading={formLoading} saveButtonProps={saveButtonProps}>
@@ -36,7 +59,7 @@ export default function CategoryCreate({}: Props) {
             render={({ field }) => (
               <>
                 <FormLabel
-                  required={false}
+                  required={true}
                   sx={{
                     marginBottom: "8px",
                     fontWeight: "700",
@@ -65,15 +88,70 @@ export default function CategoryCreate({}: Props) {
             )}
           />
         </FormControl>
+        <FormControl key={"authorId"}>
+          <Controller
+            control={control}
+            name="authorId"
+            render={({ field }) => (
+              <>
+                <FormLabel
+                  required={false}
+                  sx={{
+                    marginBottom: "8px",
+                    fontWeight: "700",
+                    fontSize: "14px",
+                    color: "text.primary",
+                  }}
+                >
+                  {t("table.authorId")}
+                </FormLabel>
+                <Autocomplete
+                  {...field}
+                  {...register("authorId", {
+                    required: t("errors.required.field", {
+                      field: t("table.authorId"),
+                    }),
+                  })}
+                  {...authorIdAutocompleteProps}
+                  onChange={(_, value: User | null) => {
+                    if (value) {
+                      field.onChange(value.id);
+                    }
+                  }}
+                  getOptionLabel={(option) => option.email}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      error={!!(errors as any)?.authorId}
+                      helperText={(errors as any)?.authorId?.message}
+                      margin="none"
+                      required
+                      size="small"
+                      variant="outlined"
+                    />
+                  )}
+                />
+              </>
+            )}
+          />
+        </FormControl>
       </Stack>
     </Create>
   );
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
+  const authorIdData = await dataProvider(
+    process.env.NEXT_PUBLIC_SERVER_API_URL as string,
+    axiosInstance
+  ).getList({
+    resource: "user",
+  });
+
   return {
     props: {
       ...(await serverSideTranslations(context.locale ?? "en", ["common"])),
+      authorIdData,
     },
   };
 };

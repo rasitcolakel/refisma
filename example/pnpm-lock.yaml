@@ -68,8 +68,8 @@ dependencies:
     specifier: ^7.43.9
     version: 7.43.9(react@18.0.0)
   refisma:
-    specifier: 0.0.27
-    version: 0.0.27
+    specifier: 0.0.31
+    version: 0.0.31
   zod:
     specifier: ^3.21.4
     version: 3.21.4
@@ -5772,8 +5772,8 @@ packages:
       esprima: 4.0.1
     dev: false
 
-  /refisma@0.0.27:
-    resolution: {integrity: sha512-YcKSsQoYQIEbFHY+4ixiwAy+LiyzWJFRtDUPtDNp00/MgXEqRhkEn1VaDqdF9i9gnzouqarHh9IMfTvSWuT2lg==}
+  /refisma@0.0.31:
+    resolution: {integrity: sha512-HRsLm1zP6m1gw/SvkMJrVBfAPWDPHW16XDLk5y2gX1DWJpnzFg/EQY4lBJ9+fC0EntRgqjqKRTCakfQM0Bcz2A==}
     engines: {node: '>=12.10'}
     hasBin: true
     dev: false

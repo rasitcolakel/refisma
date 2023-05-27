@@ -29,6 +29,11 @@ export default function CategoryList() {
         headerName: t("table.name"),
       },
       {
+        field: "authorId",
+        flex: 1,
+        headerName: t("table.authorId"),
+      },
+      {
         field: "actions",
         headerName: t("table.actions"),
         flex: 1,

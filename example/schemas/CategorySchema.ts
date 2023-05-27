@@ -1,7 +1,8 @@
 import { z } from "zod";
 
 const body = z.object({
-  name: z.string().optional(),
+  name: z.string(),
+  authorId: z.preprocess(Number, z.number()).optional(),
 });
 
 const query = z.object({

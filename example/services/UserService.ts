@@ -8,7 +8,12 @@ const user = Prisma.validator<Prisma.UserArgs>()({
     id: true,
     email: true,
     name: true,
-    posts: true,
+    _count: {
+      select: {
+        posts: true,
+        categories: true,
+      },
+    },
   },
 });
 
@@ -34,7 +39,7 @@ export const getByIdUser = async (id: number) => {
   return result;
 };
 export const findManyUser = async () => {
-  const result = await model.findMany();
+  const result = await model.findMany({ select });
 
   return result;
 };

@@ -50,7 +50,7 @@ export default function PostCreate({ idData }: Props) {
         <Typography variant="body1" fontWeight="bold" key="Post-categoryId">
           {t("table.categoryId")}
         </Typography>
-        <Typography>{record?.category.id}</Typography>
+        <Typography>{record?.category.name}</Typography>
       </Stack>
     </Show>
   );

@@ -7,7 +7,19 @@ const category = Prisma.validator<Prisma.CategoryArgs>()({
   select: {
     id: true,
     name: true,
-    posts: true,
+    authorId: true,
+    author: {
+      select: {
+        id: true,
+        email: true,
+        name: true,
+      },
+    },
+    _count: {
+      select: {
+        posts: true,
+      },
+    },
   },
 });
 
@@ -33,7 +45,7 @@ export const getByIdCategory = async (id: number) => {
   return result;
 };
 export const findManyCategory = async () => {
-  const result = await model.findMany();
+  const result = await model.findMany({ select });
 
   return result;
 };

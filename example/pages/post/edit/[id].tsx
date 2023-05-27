@@ -269,7 +269,7 @@ export default function PostCreate({
                       field.onChange(value.id);
                     }
                   }}
-                  getOptionLabel={(option) => option.id.toString()}
+                  getOptionLabel={(option) => option.name}
                   renderInput={(params) => (
                     <TextField
                       {...params}

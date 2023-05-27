@@ -249,7 +249,7 @@ export default function PostCreate({ authorIdData, categoryIdData }: Props) {
                       field.onChange(value.id);
                     }
                   }}
-                  getOptionLabel={(option) => option.id.toString()}
+                  getOptionLabel={(option) => option.name}
                   renderInput={(params) => (
                     <TextField
                       {...params}
