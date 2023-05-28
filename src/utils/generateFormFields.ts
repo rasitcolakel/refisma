@@ -1,6 +1,13 @@
 import { UIFrameworks } from '@refinedev/cli'
-import { Field, FormField, Model } from '../types'
-import { excludeIdField, excludeNonRequiredFields, excludeRelationFields, findIdField, getAllRequiredFields } from '.'
+import { Element, Field, FormField, Model } from '../types'
+import {
+    excludeIdField,
+    excludeNonRequiredFields,
+    excludeRelationFields,
+    findIdField,
+    getAllRequiredFields,
+    mergeSameImports,
+} from '.'
 import { PrismaScalarTypes } from '../enums'
 
 export const generateFormFields = (
@@ -227,4 +234,71 @@ const commonFieldProps = (field: FormField) => {
           }),
         
     })}`
+}
+
+interface MuiField {
+    element: Element
+    name: string
+    import: string
+    dependentImports?: string[][]
+}
+const muiFields: MuiField[] = [
+    { element: Element.checkbox, name: 'Checkbox', import: '@mui/material' },
+    { element: Element.text, name: 'TextField', import: '@mui/material' },
+    { element: Element.number, name: 'TextField', import: '@mui/material' },
+    {
+        element: Element.autocomplete,
+        name: 'Autocomplete',
+        import: '@mui/material',
+        dependentImports: [['useAutocomplete', '@refinedev/mui']],
+    },
+    {
+        element: Element.select,
+        name: 'Autocomplete',
+        import: '@mui/material',
+        dependentImports: [['useAutocomplete', '@refinedev/mui']],
+    },
+]
+
+const muiFormElements = {
+    create: ['Create', '@refinedev/mui'],
+    edit: ['Edit', '@refinedev/mui'],
+    defaultImports: [
+        ['FormControl', '@mui/material'],
+        ['FormLabel', '@mui/material'],
+        ['Stack', '@mui/material'],
+    ],
+}
+
+export const generateImportsForForm = (
+    fields: FormField[],
+    framework: UIFrameworks,
+    type: 'edit' | 'create' = 'create',
+) => {
+    const imports: string[][] = []
+    const formFields = framework === UIFrameworks.MUI ? muiFields : muiFields
+    const formElements = framework === UIFrameworks.MUI ? muiFormElements : muiFormElements
+    for (const field of fields) {
+        const formField = getFormField(formFields, field.elementType)
+        if (formField) {
+            imports.push([formField.name, formField.import])
+            if (formField.dependentImports) {
+                for (const dependentImport of formField.dependentImports) {
+                    imports.push(dependentImport)
+                }
+            }
+        }
+    }
+    if (formElements.defaultImports) {
+        for (const defaultImport of formElements.defaultImports) {
+            imports.push(defaultImport)
+        }
+    }
+
+    imports.push(formElements[type])
+    return imports
+}
+
+const getFormField = (fields: MuiField[], element: Element) => {
+    return fields.find((f) => f.element === element)
 }

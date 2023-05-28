@@ -186,6 +186,7 @@ export const prismaTypeToZod = (type: TPrismaScalarTypes) => {
 
 export const mergeSameImports = (imports: string[][]) => {
     const mergedImports: string[][] = []
+
     imports.forEach((importItem) => {
         if (importItem[2] === 'true') {
             mergedImports.push(importItem)
@@ -193,6 +194,7 @@ export const mergeSameImports = (imports: string[][]) => {
         }
         const existingImport = mergedImports.find((item) => item[1] === importItem[1])
         if (existingImport) {
+            if (existingImport[0] && existingImport[0].includes(importItem[0])) return
             existingImport[0] = `${existingImport[0]}, ${importItem[0]}`
         } else {
             mergedImports.push(importItem)
@@ -203,18 +205,18 @@ export const mergeSameImports = (imports: string[][]) => {
 
 export const fieldToFormElement = (field: Field): Element => {
     const type = field.type.replace('?', '') as TPrismaScalarTypes
-    if (field.relation && field.relation.fields?.length) return 'autocomplete'
-    if (type === PrismaScalarTypes.Int) return 'number'
-    if (type === PrismaScalarTypes.String) return 'text'
-    if (type === PrismaScalarTypes.Boolean) return 'checkbox'
-    if (type === PrismaScalarTypes.DateTime) return 'date'
-    if (type === PrismaScalarTypes.Json) return 'text'
-    if (type === PrismaScalarTypes.Bytes) return 'text'
-    if (type === PrismaScalarTypes.Decimal) return 'number'
-    if (type === PrismaScalarTypes.BigInt) return 'number'
-    if (type === PrismaScalarTypes.Float) return 'number'
-    if (type === PrismaScalarTypes.Unsupported) return 'text'
-    return 'text'
+    if (field.relation && field.relation.fields?.length) return Element.autocomplete
+    if (type === PrismaScalarTypes.Int) return Element.number
+    if (type === PrismaScalarTypes.String) return Element.text
+    if (type === PrismaScalarTypes.Boolean) return Element.checkbox
+    if (type === PrismaScalarTypes.DateTime) return Element.date
+    if (type === PrismaScalarTypes.Json) return Element.text
+    if (type === PrismaScalarTypes.Bytes) return Element.text
+    if (type === PrismaScalarTypes.Decimal) return Element.number
+    if (type === PrismaScalarTypes.BigInt) return Element.number
+    if (type === PrismaScalarTypes.Float) return Element.number
+    if (type === PrismaScalarTypes.Unsupported) return Element.text
+    return Element.text
 }
 
 export const fieldsToFormElements = (fields: Field[]): FormField[] => {

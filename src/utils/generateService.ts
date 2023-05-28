@@ -7,12 +7,7 @@ import prettier from 'prettier'
 import { MethodNames } from '../enums'
 import { generateApiFile } from './generateApiFiles'
 import { generateZodFile } from './generateZodSChemas'
-import {
-    generateRefineCreatePage,
-    generateRefineEditPage,
-    generateRefineListPage,
-    generateRefineShowPage,
-} from './generateRefinePages'
+import { generateRefineFormPage, generateRefineListPage, generateRefineShowPage } from './generateRefinePages'
 
 // create or for if statements in handlebars
 
@@ -196,8 +191,8 @@ export const generateService = (model: Model) => {
     )
 
     generateRefineListPage(model, templateParams)
-    generateRefineCreatePage(model, templateParams)
-    generateRefineEditPage(model, templateParams)
+    generateRefineFormPage(model, templateParams, 'create')
+    generateRefineFormPage(model, templateParams, 'edit')
     generateRefineShowPage(model, templateParams)
 
     return templateCompiler
