@@ -6,6 +6,35 @@ Refisma is a tool to help you create CRUD applications by using Prisma. It gener
 
 Refisma is a tool to help you create CRUD applications by using Prisma. It generates services and endpoints for you, so you can focus on the business logic.
 
+
+## Supported Platforms
+
+- [x] Next.js
+- [ ] Node.js (Express)
+
+## Supported UI Frameworks
+- [x] MaterialUI
+- [ ] ChakraUI
+- [ ] Ant Design
+- [ ] Mantine
+
+## Upcoming Features
+
+- [x] Types will be based on the Prisma schema
+- [x] Zod validation
+- [ ] Pagination
+- [ ] Sorting
+- [ ] Filtering
+- [ ] Generating services and endpoints for Relations
+  - [x] One to One
+  - [x] One to Many
+  - [ ] Many to Many
+- [x] Refine Pages (Only for Next.js & MaterialUI)
+  - [x] List Page
+  - [x] Create Page
+  - [x] Edit Page
+  - [x] Show Page
+
 ## Installation
 
 ```bash
@@ -53,33 +82,3 @@ You need to add aliases to your tsconfig.json file.
 ```bash
 npx prisma generate
 ```
-
-## Supported Platforms
-
-- [x] Next.js
-- [ ] Node.js (Express)
-
-## Supported UI Frameworks
-- [x] MaterialUI
-- [ ] ChakraUI
-- [ ] Ant Design
-- [ ] Mantine
-
-## Upcoming Features
-
-- [x] Types will be based on the Prisma schema
-- [x] Zod validation
-- [ ] Pagination
-- [ ] Sorting
-- [ ] Filtering
-- [ ] Generating services and endpoints for Relations
-  - [ ] One to One
-  - [ ] One to Many
-  - [ ] Many to Many
-- [ ] Refine Pages
-  - [ ] List Page
-  - [ ] Create Page
-  - [ ] Edit Page
-  - [ ] Show Page
-  - [ ] Delete Page
-- 

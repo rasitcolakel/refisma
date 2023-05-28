@@ -1,8 +1,8 @@
 {
   "name": "refisma",
-  "version": "0.0.33",
+  "version": "0.0.34",
   "description": "Refisma is a CLI to create full-stack resources with Next JS, Prisma and Refine",
-  "main": "lib/index.js",
+  "main": "lib/cli.js",
   "source": "src/index.ts",
   "scripts": {
     "dev": "tsc -w",

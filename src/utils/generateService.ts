@@ -9,8 +9,8 @@ import { generateApiFile } from './generateApiFiles'
 import { generateZodFile } from './generateZodSChemas'
 import { generateRefineFormPage, generateRefineListPage, generateRefineShowPage } from './generateRefinePages'
 import { UIFrameworks } from '@refinedev/cli'
-import { generateInferencerFiles } from './generateInferencerFiles'
 import ora from 'ora'
+import chalk from 'chalk'
 
 // create or for if statements in handlebars
 
@@ -215,7 +215,7 @@ export const generateService = async (model: Model, UIFramework: UIFrameworks) =
         generateRefineShowPage(model, templateParams)
         spinner4.succeed(`Generated show page`)
     } else {
-        generateInferencerFiles(model, UIFramework)
+        console.log(chalk.yellow(`UI Framework ${UIFramework} is not supported yet`))
     }
 
     return templateCompiler
