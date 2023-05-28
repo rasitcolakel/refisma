@@ -9,7 +9,49 @@ Refisma is a tool to help you create CRUD applications by using Prisma. It gener
 ## Installation
 
 ```bash
-npm install -g refisma
+npm install refisma
+```
+
+## Usage
+
+```bash
+npx refisma
+```
+
+### Packages Needed
+
+````
+npm install @prisma/client zod
+npm install prisma --save-dev
+````
+
+### .env file
+
+```
+DATABASE_URL=""
+NEXT_PUBLIC_SERVER_API_URL='http://localhost:3000/api'
+```
+
+### Adding Aliases
+
+You need to add aliases to your tsconfig.json file.
+
+```json
+{
+  ...
+    "paths": {
+      "@services/*": ["services/*"],
+      "@schemas/*": ["schemas/*"],
+      ...
+    }
+  ...
+}
+```
+
+### Generating Types for Prisma
+
+```bash
+npx prisma generate
 ```
 
 ## Supported Platforms
