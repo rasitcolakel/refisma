@@ -302,3 +302,38 @@ export const generateImportsForForm = (
 const getFormField = (fields: MuiField[], element: Element) => {
     return fields.find((f) => f.element === element)
 }
+
+const muiViewElements = {
+    defaultImports: [],
+    singularImports: [
+        ['Show', '@refinedev/mui'],
+        ['Typography', '@mui/material'],
+        ['Stack', '@mui/material'],
+    ],
+    pluralImports: [
+        ['DeleteButton', '@refinedev/mui'],
+        ['EditButton', '@refinedev/mui'],
+        ['List', '@refinedev/mui'],
+        ['ShowButton', '@refinedev/mui'],
+        ['useDataGrid', '@refinedev/mui'],
+        ['DataGrid', '@mui/x-data-grid'],
+        ['GridColumns', '@mui/x-data-grid'],
+    ],
+}
+
+export const generateImportsForView = (framework: UIFrameworks, singular: boolean = true) => {
+    const imports: string[][] = []
+    const formElements = framework === UIFrameworks.MUI ? muiViewElements : muiViewElements
+    if (formElements.defaultImports.length > 0) imports.push(formElements.defaultImports[0])
+
+    if (singular) {
+        for (const singularImport of formElements.singularImports) {
+            imports.push(singularImport)
+        }
+    } else {
+        for (const pluralImport of formElements.pluralImports) {
+            imports.push(pluralImport)
+        }
+    }
+    return imports
+}

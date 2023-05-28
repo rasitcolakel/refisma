@@ -15,6 +15,7 @@ import {
 import {
     generateFormFields,
     generateImportsForForm,
+    generateImportsForView,
     generateRelationFormDependencies,
     generateShowProps,
 } from './generateFormFields'
@@ -44,15 +45,8 @@ handlebars.registerHelper('isArray', function (arg1: string, options) {
 
 const listImports = (model: Model) => [
     ['React', 'react', 'true'],
-    ['DataGrid', '@mui/x-data-grid'],
-    ['GridColumns', '@mui/x-data-grid'],
     [model.name, '@prisma/client'],
     ['useTranslate', '@refinedev/core'],
-    ['DeleteButton', '@refinedev/mui'],
-    ['EditButton', '@refinedev/mui'],
-    ['List', '@refinedev/mui'],
-    ['ShowButton', '@refinedev/mui'],
-    ['useDataGrid', '@refinedev/mui'],
     ['GetServerSideProps', 'next'],
     ['serverSideTranslations', 'next-i18next/serverSideTranslations'],
 ]
@@ -61,7 +55,7 @@ export const generateRefineListPage = (model: Model, templateParams: Repository)
     const template = readFileSync(path.join(refineTemplatesPath, 'list.ts.hbs'), 'utf-8')
     const templateCompiler = handlebars.compile(template)
 
-    const imports = listImports(model)
+    const imports = [...listImports(model), ...generateImportsForView(UIFrameworks.MUI, false)]
 
     const compiledTemplate = prettier.format(
         templateCompiler({
@@ -102,7 +96,6 @@ export const generateRefineFormPage = (
     const imports = [...createImports(model), ...formImports]
     const relations = getSingleRelationFields(model.fields)
     const relationFields = generateRelationFormDependencies(getSingleRelationFields(relations), type, model)
-    console.log(type, relationFields[0])
     if (relations.length > 0) {
         imports.push(['axiosInstance', '@refinedev/simple-rest'])
         imports.push(['dataProvider', '@refinedev/simple-rest', 'true'])
@@ -141,9 +134,6 @@ const showImports = (model: Model) => [
     ['GetServerSideProps', 'next'],
     ['serverSideTranslations', 'next-i18next/serverSideTranslations'],
     ['useShow', '@refinedev/core'],
-    ['Show', '@refinedev/mui'],
-    ['Stack', '@mui/material'],
-    ['Typography', '@mui/material'],
     [`${model.name}Select`, `@services/${model.name}Service`],
 ]
 
@@ -155,7 +145,7 @@ export const generateRefineShowPage = (model: Model, templateParams: Repository)
         model,
         UIFrameworks.MUI,
     )
-    const imports = showImports(model)
+    const imports = [...showImports(model), ...generateImportsForView(UIFrameworks.MUI, true)]
     const initialResources = generateShowProps(model.fields, model)
     imports.push(['GetOneResponse', '@refinedev/core'])
     imports.push(['axiosInstance', '@refinedev/simple-rest'])
