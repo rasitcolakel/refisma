@@ -3,7 +3,7 @@ import { Model, Repository } from '../types'
 import handlebars from 'handlebars'
 import prettier from 'prettier'
 import path from 'path'
-import { writeFile } from '.'
+import { makePlural, writeFile } from '.'
 handlebars.registerHelper('ifEquals', function (arg1, arg2, options) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
@@ -14,7 +14,7 @@ export const generateZodFile = (model: Model, templateParams: Repository) => {
     const templateCompiler = handlebars.compile(template)
 
     const compiledTemplate = prettier.format(templateCompiler(templateParams), { parser: 'typescript' })
-    writeFile(`schemas/${model.name}Schema.ts`, compiledTemplate)
+    writeFile(`schemas/${makePlural(model.name)}Schema.ts`, compiledTemplate)
 
     return compiledTemplate
 }

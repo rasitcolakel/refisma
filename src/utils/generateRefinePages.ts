@@ -9,6 +9,7 @@ import {
     findIdField,
     generateShowFields,
     getSingleRelationFields,
+    makePlural,
     mergeSameImports,
     writeFile,
 } from '.'
@@ -67,7 +68,7 @@ export const generateRefineListPage = (model: Model, templateParams: Repository)
         }),
         { parser: 'typescript' },
     )
-    writeFile(`pages/${model.name.toLowerCase()}/index.tsx`, compiledTemplate)
+    writeFile(`pages/${makePlural(model.name.toLowerCase())}/index.tsx`, compiledTemplate)
 
     return compiledTemplate
 }
@@ -120,9 +121,9 @@ export const generateRefineFormPage = (
         { parser: 'typescript' },
     )
     if (type === 'create') {
-        writeFile(`pages/${model.name.toLowerCase()}/create/index.tsx`, compiledTemplate)
+        writeFile(`pages/${makePlural(model.name.toLowerCase())}/create/index.tsx`, compiledTemplate)
     } else {
-        writeFile(`pages/${model.name.toLowerCase()}/edit/[id].tsx`, compiledTemplate)
+        writeFile(`pages/${makePlural(model.name.toLowerCase())}/edit/[id].tsx`, compiledTemplate)
     }
 
     return compiledTemplate
@@ -163,7 +164,7 @@ export const generateRefineShowPage = (model: Model, templateParams: Repository)
         }),
         { parser: 'typescript' },
     )
-    writeFile(`pages/${model.name.toLowerCase()}/show/[id].tsx`, compiledTemplate)
+    writeFile(`pages/${makePlural(model.name.toLowerCase())}/show/[id].tsx`, compiledTemplate)
 
     return compiledTemplate
 }

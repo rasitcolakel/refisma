@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import { {{#each methods}} {{name}}{{@root.name}} {{#unless @last}},{{/unless}} {{/each}} } from '@services/{{name}}Service'
-import { {{#each methods}} {{this.name}}{{@root.name}}Schema {{#unless @last}},{{/unless}} {{/each}} } from '@schemas/{{name}}Schema'
+import { {{#each methods}} {{name}}{{@root.name}} {{#unless @last}},{{/unless}} {{/each}} } from '@services/{{pluralizedName}}Service'
+import { {{#each methods}} {{this.name}}{{@root.name}}Schema {{#unless @last}},{{/unless}} {{/each}} } from '@schemas/{{pluralizedName}}Schema'
 import { Prisma } from '@prisma/client';
 import { validateSchema } from "refisma";
 

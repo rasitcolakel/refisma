@@ -3,6 +3,8 @@ import chalk from 'chalk'
 import { getUIFramework } from './utils'
 import { getModels } from './utils/readModels'
 import { generateService } from './utils/generateService'
+import ora from 'ora'
+
 export const main = async () => {
     const models = getModels()
     const response = (await prompt({
@@ -19,9 +21,15 @@ export const main = async () => {
     }
 
     const uiFramework = getUIFramework()
+    if (!uiFramework) {
+        console.log(chalk.red('No UI framework detected.'))
+        process.exit(1)
+    }
 
     for (const model of selectedModels) {
-        generateService(model)
+        const spinner = ora(`Generating ${model.name} service`).start()
+        await generateService(model, uiFramework)
+        spinner.succeed(`Generated pages for ${model.name}`)
     }
 }
 

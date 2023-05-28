@@ -1,4 +1,4 @@
-import { findIdField, generateZodSchema, prismaTypeToTS, writeFile } from './../utils'
+import { findIdField, generateZodSchema, makePlural, prismaTypeToTS, writeFile } from './../utils'
 import { readFileSync } from 'fs'
 import handlebars from 'handlebars'
 import path from 'path'
@@ -8,6 +8,9 @@ import { MethodNames } from '../enums'
 import { generateApiFile } from './generateApiFiles'
 import { generateZodFile } from './generateZodSChemas'
 import { generateRefineFormPage, generateRefineListPage, generateRefineShowPage } from './generateRefinePages'
+import { UIFrameworks } from '@refinedev/cli'
+import { generateInferencerFiles } from './generateInferencerFiles'
+import ora from 'ora'
 
 // create or for if statements in handlebars
 
@@ -35,7 +38,7 @@ handlebars.registerHelper('ifAndNot' as any, function (arg1, arg2, options) {
     return !arg1 && !arg2 ? options.fn(this) : options.inverse(this)
 })
 
-export const generateService = (model: Model) => {
+export const generateService = async (model: Model, UIFramework: UIFrameworks) => {
     const template = readFileSync(path.join(__dirname, '../../templates', 'service.ts.hbs'), 'utf-8')
     const templateCompiler = handlebars.compile(template)
 
@@ -52,6 +55,7 @@ export const generateService = (model: Model) => {
 
     const templateParams: Repository = {
         name: model.name,
+        pluralizedName: makePlural(model.name),
         lowercasedName: model.name.charAt(0).toLowerCase() + model.name.slice(1),
         methods: [
             {
@@ -170,7 +174,7 @@ export const generateService = (model: Model) => {
     }
     const compiledTemplate = prettier.format(templateCompiler(templateParams), { parser: 'typescript' })
 
-    writeFile(`services/${model.name}Service.ts`, compiledTemplate)
+    writeFile(`services/${makePlural(model.name)}Service.ts`, compiledTemplate)
     generateZodFile(model, templateParams)
     // generate single file for all endpoints
     generateApiFile(
@@ -190,10 +194,29 @@ export const generateService = (model: Model) => {
         'index',
     )
 
-    generateRefineListPage(model, templateParams)
-    generateRefineFormPage(model, templateParams, 'create')
-    generateRefineFormPage(model, templateParams, 'edit')
-    generateRefineShowPage(model, templateParams)
+    if (UIFramework === UIFrameworks.MUI) {
+        const spinner = ora(`Generating list page`).start()
+        spinner.indent = 5
+        generateRefineListPage(model, templateParams)
+        spinner.succeed(`Generated list page`)
+
+        const spinner2 = ora(`Generating create page`).start()
+        spinner2.indent = 5
+        generateRefineFormPage(model, templateParams, 'create')
+        spinner2.succeed(`Generated create page`)
+
+        const spinner3 = ora(`Generating edit page`).start()
+        spinner3.indent = 5
+        generateRefineFormPage(model, templateParams, 'edit')
+        spinner3.succeed(`Generated edit page`)
+
+        const spinner4 = ora(`Generating show page`).start()
+        spinner4.indent = 5
+        generateRefineShowPage(model, templateParams)
+        spinner4.succeed(`Generated show page`)
+    } else {
+        generateInferencerFiles(model, UIFramework)
+    }
 
     return templateCompiler
 }

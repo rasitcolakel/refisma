@@ -14,6 +14,7 @@ type Param = {
 
 export type Repository = {
     name: string
+    pluralizedName: string
     lowercasedName: string
     methods: {
         isSingular: boolean

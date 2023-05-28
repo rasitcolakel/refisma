@@ -4,7 +4,7 @@ import path from 'path'
 import { Element, Field, FormField, Model } from '../types'
 import { PrismaScalarTypes, TPrismaScalarTypes } from '../enums'
 import { ZodModel } from '../types'
-
+import pluralize from 'pluralize'
 export const getPackageJson = (): any => {
     if (!existsSync('package.json')) {
         throw new Error('./package.json not found')
@@ -43,7 +43,7 @@ export const getUIFramework = (): UIFrameworks | undefined => {
         return UIFrameworks.MANTINE
     }
 
-    return UIFrameworks.MUI
+    return UIFrameworks.MANTINE
 }
 
 export const checkFolderExists = (p: string) => {
@@ -290,4 +290,8 @@ export const getIdField = (fields: Field[]) => {
 
 export const excludeNonRequiredFields = (fields: Field[]) => {
     return fields.filter((field) => field.isRequired)
+}
+
+export const makePlural = (name: string) => {
+    return pluralize.plural(name)
 }
