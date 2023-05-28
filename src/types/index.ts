@@ -42,16 +42,17 @@ export type FormField = Field & {
     elementType: Element
 }
 
-export type Element =
-    | 'text'
-    | 'number'
-    | 'date'
-    | 'select'
-    | 'checkbox'
-    | 'radio'
-    | 'switch'
-    | 'slider'
-    | 'autocomplete'
+export enum Element {
+    text = 'text',
+    number = 'number',
+    date = 'date',
+    select = 'select',
+    checkbox = 'checkbox',
+    radio = 'radio',
+    switch = 'switch',
+    slider = 'slider',
+    autocomplete = 'autocomplete',
+}
 
 export type Field = {
     name: string
