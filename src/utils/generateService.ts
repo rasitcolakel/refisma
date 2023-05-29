@@ -56,6 +56,7 @@ export const generateService = async (model: Model, UIFramework: UIFrameworks) =
     const templateParams: Repository = {
         name: model.name,
         pluralizedName: makePlural(model.name),
+        pluralizedNameLowercased: makePlural(model.name).toLowerCase(),
         lowercasedName: model.name.charAt(0).toLowerCase() + model.name.slice(1),
         methods: [
             {

@@ -43,7 +43,7 @@ export const getUIFramework = (): UIFrameworks | undefined => {
         return UIFrameworks.MANTINE
     }
 
-    return UIFrameworks.MANTINE
+    return UIFrameworks.MUI
 }
 
 export const checkFolderExists = (p: string) => {
@@ -138,9 +138,7 @@ export const generateShowFields = (fields: Field[]): Field[] => {
                 excludeRelationFields(getAllRequiredFields(field.relatedModel.fields)),
             )
 
-            if (isRelationOptional) {
-                newName += '?'
-            }
+            newName += '?'
 
             if (requiredFields.length) {
                 newName += '.' + requiredFields[0].name

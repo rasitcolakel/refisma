@@ -60,6 +60,7 @@ export const generateRefineListPage = (model: Model, templateParams: Repository)
 
     const compiledTemplate = prettier.format(
         templateCompiler({
+            ...templateParams,
             ...model,
             excludedModels: excludeRelationFields(model.fields),
             actions: true,
@@ -110,6 +111,7 @@ export const generateRefineFormPage = (
     }
     const compiledTemplate = prettier.format(
         templateCompiler({
+            ...templateParams,
             ...model,
             excludedModels: excludeRelationFields(model.fields),
             actions: true,
@@ -135,7 +137,7 @@ const showImports = (model: Model) => [
     ['GetServerSideProps', 'next'],
     ['serverSideTranslations', 'next-i18next/serverSideTranslations'],
     ['useShow', '@refinedev/core'],
-    [`${model.name}Select`, `@services/${model.name}Service`],
+    [`${model.name}Select`, `@services/${makePlural(model.name)}Service`],
 ]
 
 export const generateRefineShowPage = (model: Model, templateParams: Repository) => {
@@ -153,6 +155,7 @@ export const generateRefineShowPage = (model: Model, templateParams: Repository)
     imports.push(['dataProvider', '@refinedev/simple-rest', 'true'])
     const compiledTemplate = prettier.format(
         templateCompiler({
+            ...templateParams,
             ...model,
             lowercasedName: model.name.charAt(0).toLowerCase() + model.name.slice(1),
             fields: generateShowFields(model.fields),

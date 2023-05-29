@@ -13,7 +13,7 @@ export default function {{name}}Create({
 }:Props) {
     const t = useTranslate();
     const { queryResult } = useShow<{{name}}Select>({
-        resource: "{{lowercasedName}}",
+        resource: "{{pluralizedNameLowercased}}",
         queryOptions: {
             initialData : {{idField}}Data
         }

@@ -77,6 +77,32 @@ You need to add aliases to your tsconfig.json file.
 }
 ```
 
+### Adding New Resources to _app.tsx file
+
+The example below shows how to add a new resource to the _app.tsx file.
+
+
+```tsx
+  <Refine
+    ...
+    resources={[
+      ...
+      {
+          name: '{{resourceName}}',
+          list: '/{{resourceName}}',
+          create: '/{{resourceName}}/create',
+          edit: '/{{resourceName}}/edit/:id',
+          show: '/{{resourceName}}/show/:id',
+          meta: {
+              canDelete: true,
+          },
+      }
+      ...
+    ]}
+    ...
+  >
+```
+
 ### Generating Types for Prisma
 
 ```bash

@@ -6,6 +6,7 @@ import {
     excludeRelationFields,
     findIdField,
     getAllRequiredFields,
+    makePlural,
     mergeSameImports,
 } from '.'
 import { PrismaScalarTypes } from '../enums'
@@ -46,7 +47,7 @@ export const generateShowProps = (fields: Field[], model: Model): NextPropsType[
     props.push({
         type: `${idField.name}Data: GetOneResponse<${model.name}Select>`,
         name: `${idField.name}Data`,
-        resource: model.name.toLowerCase(),
+        resource: makePlural(model.name.toLowerCase()),
         function: 'getOne',
         id: idField.name,
         idFrom: 'context.params?.id as string',
@@ -66,7 +67,7 @@ export const generateRelationFormDependencies = (
         const name = (field?.relation?.fields && field?.relation?.fields[0]) || ''
         const type = field.type.replace('[]', '').replace('?', '')
         const resourceUpper = field.type.replace('[]', '').replace('?', '')
-        const resource = resourceUpper.toLowerCase()
+        const resource = makePlural(resourceUpper.toLowerCase())
         props.push({
             type: `${name}Data: GetListResponse<${type}>`,
             name: `${name}Data`,
@@ -98,7 +99,7 @@ export const generateRelationFormDependencies = (
         props.push({
             type: `${idField.name}Data: GetOneResponse<${model.name}>`,
             name: `${idField.name}Data`,
-            resource: model.name.toLowerCase(),
+            resource: makePlural(model.name.toLowerCase()),
             function: 'getOne',
             id: idField.name,
             idFrom: 'context.params?.id as string',
