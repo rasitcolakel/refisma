@@ -29,7 +29,20 @@ export default function {{name}}Create({
     {{{relationFields.[1]}}}
 
     return (
-        <Edit isLoading={formLoading} saveButtonProps={saveButtonProps}>
+        <Edit isLoading={formLoading} saveButtonProps={saveButtonProps} saveButtonProps={
+            {{#if manyToManyRelations.length}}
+                {
+                    ...saveButtonProps,
+                    onClick: (e) => {
+                        {{> manyToManyMapper manyToManyRelations=manyToManyRelations action="create"}}
+                        saveButtonProps.onClick(e)
+                    }
+                }
+            {{else}}
+                saveButtonProps
+            {{/if}}
+        }>
+            {{{formFields}}}>
             {{{formFields}}}
         </Edit>   
     );

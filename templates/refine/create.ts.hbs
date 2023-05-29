@@ -17,15 +17,42 @@ export default function {{name}}Create({
         refineCore: { formLoading },
         register,
         control,
+        {{#if manyToManyRelations.length}}
+            setValue,
+            getValues,
+        {{/if}}
         formState: { errors },
     } = useForm<{{name}}, HttpError>();
 
     {{{relationFields.[1]}}}
 
     return (
-        <Create isLoading={formLoading} saveButtonProps={saveButtonProps}>
+        
+        {{#ifEquals action "create"}}
+            <Create 
+        {{else}}
+            <Edit 
+        {{/ifEquals}}
+        isLoading={formLoading}  saveButtonProps={
+            {{#if manyToManyRelations.length}}
+                {
+                    ...saveButtonProps,
+                    onClick: (e) => {
+                        {{> manyToManyMapper manyToManyRelations=manyToManyRelations action=action}}
+                        saveButtonProps.onClick(e)
+                    }
+                }
+            {{else}}
+                saveButtonProps
+            {{/if}}
+        }>
             {{{formFields}}}
-        </Create>   
+        {{#ifEquals action "create"}}
+            </Create>  
+        {{else}}
+            </Edit>  
+        {{/ifEquals}}
+          
     );
 }
 
