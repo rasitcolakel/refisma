@@ -21,6 +21,7 @@ export const parseSchema = (schema: string): Model[] => {
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i]
         if (line.startsWith('//') || line.trim().startsWith('@')) continue
+        if (line.startsWith('enum ')) continue
         if (line.startsWith('model ')) {
             const name = line.split(' ')[1]
             model = {
@@ -59,23 +60,32 @@ const parseField = (line: string): Field => {
     const [name, type, ...options] = arrayLine.split(' ') as string[]
     const relationOptions = arrayLine.split('@relation')[1]
     const relation: PrismaRelationArgs = {}
+    let staticRelationName = ''
     if (relationOptions) {
-        const relationArgs = relationOptions.replace('(', '').replace(')', '').split(',')
+        const relationArgs = relationOptions
+            .replace('(', '')
+            .replace(')', '')
+            .split(',')
+            .map((arg) => arg.trim().replaceAll('"', ''))
         relationArgs.forEach((arg) => {
             const [key, value] = arg.split(':') as [KeyOf<PrismaRelationArgs>, string]
-            const trimmedKey = key.trim() as KeyOf<PrismaRelationArgs>
-            if (trimmedKey === 'fields') {
-                relation[trimmedKey] = value
-                    .trim()
-                    .replace('[', '')
-                    .replace(']', '')
-                    .split(',')
-                    .map((field) => field.trim())
+            if (key && value) {
+                if (key === 'fields') {
+                    relation[key] = value
+                        .trim()
+                        .replace('[', '')
+                        .replace(']', '')
+                        .split(',')
+                        .map((field) => field.trim())
+                } else {
+                    relation[key] = value.replace('[', '').replace(']', '').trim()
+                }
             } else {
-                relation[trimmedKey] = value.replace('[', '').replace(']', '').trim()
+                staticRelationName = key
             }
         })
     }
+
     const isList = type.endsWith('[]')
     const isRelation =
         relation.fields && relation.fields.length > 0 && relation.references
@@ -92,6 +102,7 @@ const parseField = (line: string): Field => {
 
     return {
         name,
+        staticRelationName,
         type: type as TPrismaScalarTypes,
         isList,
         isRelation,

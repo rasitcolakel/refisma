@@ -58,6 +58,7 @@ export enum Element {
 
 export type Field = {
     name: string
+    staticRelationName?: string
     showName?: string
     type: TPrismaScalarTypes
     isList: boolean
