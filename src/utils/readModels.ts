@@ -91,6 +91,8 @@ const parseField = (line: string): Field => {
         relation.fields && relation.fields.length > 0 && relation.references
             ? true
             : !PrismaScalarTypes[(isList ? type.replace('[]', '') : type.replace('?', '')) as TPrismaScalarTypes]
+    const customListType =
+        isList && !PrismaScalarTypes[(isList ? type.replace('[]', '') : type.replace('?', '')) as TPrismaScalarTypes]
     const isRequired = !type.includes('?')
     const isUnique = options.includes('@unique')
     const isId = options.includes('@id')
@@ -107,12 +109,12 @@ const parseField = (line: string): Field => {
         isList,
         isRelation,
         relation,
-        isRequired,
+        isRequired: customListType ? false : isRequired,
         isUnique,
         isId,
         isUpdatedAt,
         isCreatedAt,
-        isOptional,
+        isOptional: customListType ? true : isOptional,
         isReadOnly,
         isGenerated,
     }

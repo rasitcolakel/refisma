@@ -64,10 +64,14 @@ export const generateRelationFormDependencies = (
     const props: NextPropsType[] = []
 
     const autocompleteOptions = fields.map((field) => {
-        const name = (field?.relation?.fields && field?.relation?.fields[0]) || ''
+        let name = (field?.relation?.fields && field?.relation?.fields[0]) || ''
         const type = field.type.replace('[]', '').replace('?', '')
         const resourceUpper = field.type.replace('[]', '').replace('?', '')
         const resource = makePlural(resourceUpper.toLowerCase())
+        const customType = !PrismaScalarTypes[type as keyof typeof PrismaScalarTypes]
+        if (customType && field.isList) {
+            name = field.name
+        }
         props.push({
             type: `${name}Data: GetListResponse<${type}>`,
             name: `${name}Data`,
@@ -134,8 +138,13 @@ function generateMUIFormFields(fields: FormField[], model: Model, type: 'create'
             if (!field.relatedModel) {
                 return
             }
-            const relationModel = field.relatedModel.name.replace('[]', '').replace('?', '')
             const idField = findIdField(field.relatedModel?.fields)
+            const customType = !PrismaScalarTypes[field.type as keyof typeof PrismaScalarTypes] && field.isList
+            let relationModel = field.relatedModel.name.replace('?', '')
+            if (customType) {
+                relationModel = relationModel + '[]'
+            }
+
             const excludes = getAllRequiredFields(
                 excludeRelationFields(excludeNonRequiredFields(excludeIdField(field.relatedModel.fields))),
             )
@@ -151,16 +160,15 @@ function generateMUIFormFields(fields: FormField[], model: Model, type: 'create'
                     optionKey += '.toString()'
                 }
             }
-
             items.push(
                 insideOfController(
                     field,
                     `<Autocomplete
                             ${commonFieldProps(field)}
                             {...${field.name}AutocompleteProps}
-                            onChange={(_, value: ${relationModel}| null) => {
-                                if (value) {
-                                  field.onChange(value.${idField.name});
+                            onChange={(_, v: ${relationModel}| null) => {
+                                if (v) {
+                                  field.onChange(v${!customType ? `.` + idField.name : ''});
                                 }
                             }}
                             getOptionLabel={(option) => option.${optionKey}}
@@ -175,9 +183,12 @@ function generateMUIFormFields(fields: FormField[], model: Model, type: 'create'
                                     variant="outlined"
                                 />
                             )}
+                            ${customType ? `multiple` : ''}
                             ${
                                 type === 'edit'
-                                    ? `defaultValue={${field.name}AutocompleteProps.options.find(o=>o.id===${idFieldOfModel.name}Data?.data.${field.name})}`
+                                    ? customType
+                                        ? `defaultValue={${idFieldOfModel.name}Data?.data.${field.name} || []}`
+                                        : `defaultValue={${field.name}AutocompleteProps.options.find(o=>o.id===${idFieldOfModel.name}Data?.data.${field.name})}`
                                     : ''
                             }
                         />`,
@@ -228,11 +239,14 @@ const insideOfController = (field: FormField, item: string) => {
 }
 
 const commonFieldProps = (field: FormField) => {
+    const required = !field.isRequired
+        ? 'false'
+        : `t('errors.required.field', {
+        field: t('table.${field.name}'),
+      })`
     return `{...field}
     {...register("${field.name}", {
-        required: t('errors.required.field', {
-            field: t('table.${field.name}'),
-          }),
+        required: ${required},
         
     })}`
 }

@@ -8,8 +8,10 @@ import {
     fieldsToFormElements,
     findIdField,
     generateShowFields,
+    getRelationFieldsWithCustomTypes,
     getSingleRelationFields,
     makePlural,
+    manyToManyRelations,
     mergeSameImports,
     writeFile,
 } from '.'
@@ -27,6 +29,10 @@ const refineTemplatesPath = path.join(__dirname, '../../templates/refine')
 handlebars.registerPartial('columns', readFileSync(path.join(refineTemplatesPath, 'list/columns.ts.hbs'), 'utf-8'))
 
 handlebars.registerPartial('imports', readFileSync(path.join(refineTemplatesPath, 'list/imports.ts.hbs'), 'utf-8'))
+handlebars.registerPartial(
+    'manyToManyMapper',
+    readFileSync(path.join(refineTemplatesPath, 'common/manyToManyMapper.ts.hbs'), 'utf-8'),
+)
 
 handlebars.registerPartial(
     'getServerSideProps',
@@ -37,6 +43,8 @@ handlebars.registerPartial(
     'renderShow',
     readFileSync(path.join(refineTemplatesPath, '/show/renderShow.ts.hbs'), 'utf-8'),
 )
+
+handlebars.registerHelper('makeCapital', (str: string) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase())
 
 handlebars.registerHelper('isArray', function (arg1: string, options) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -90,14 +98,14 @@ export const generateRefineFormPage = (
     templateParams: Repository,
     type: 'create' | 'edit' = 'create',
 ) => {
-    const template = readFileSync(path.join(refineTemplatesPath, type + '.ts.hbs'), 'utf-8')
+    const template = readFileSync(path.join(refineTemplatesPath, 'create.ts.hbs'), 'utf-8')
     const templateCompiler = handlebars.compile(template)
     const formElements = fieldsToFormElements(model.fields.filter((field) => !field.isId && !field.isRelation))
-    const formFields = generateFormFields(formElements, model, UIFrameworks.MUI, type)
+    const manyToManyFields = fieldsToFormElements(manyToManyRelations(model.fields)) || null
+    const formFields = generateFormFields([...formElements, ...manyToManyFields], model, UIFrameworks.MUI, type)
     const formImports = generateImportsForForm(formElements, UIFrameworks.MUI, type)
     const imports = [...createImports(model), ...formImports]
     const relations = getSingleRelationFields(model.fields)
-    const relationFields = generateRelationFormDependencies(getSingleRelationFields(relations), type, model)
     if (relations.length > 0) {
         imports.push(['axiosInstance', '@refinedev/simple-rest'])
         imports.push(['dataProvider', '@refinedev/simple-rest', 'true'])
@@ -109,6 +117,16 @@ export const generateRefineFormPage = (
             imports.push([f.type.replace('[]', '').replace('?', ''), '@prisma/client'])
         })
     }
+
+    if (manyToManyFields) {
+        imports.push(['GetListResponse', '@refinedev/core'])
+        imports.push(['Prisma', '@prisma/client'])
+        for (const field of manyToManyFields) {
+            imports.push([field.type.replace('[]', '').replace('?', ''), '@prisma/client'])
+        }
+    }
+    const relationFields = generateRelationFormDependencies([...relations, ...manyToManyFields], type, model)
+
     const compiledTemplate = prettier.format(
         templateCompiler({
             ...templateParams,
@@ -119,6 +137,8 @@ export const generateRefineFormPage = (
             imports: mergeSameImports(imports),
             formFields: formFields,
             relationFields,
+            manyToManyRelations: manyToManyFields,
+            action: type,
         }),
         { parser: 'typescript' },
     )

@@ -202,8 +202,9 @@ export const mergeSameImports = (imports: string[][]) => {
 }
 
 export const fieldToFormElement = (field: Field): Element => {
-    const type = field.type.replace('?', '') as TPrismaScalarTypes
-    if (field.relation && field.relation.fields?.length) return Element.autocomplete
+    const type = field.type.replace('?', '').replace('[]', '') as TPrismaScalarTypes
+    const customType = !PrismaScalarTypes[type]
+    if ((field.relation && field.relation.fields?.length) || (customType && field.isList)) return Element.autocomplete
     if (type === PrismaScalarTypes.Int) return Element.number
     if (type === PrismaScalarTypes.String) return Element.text
     if (type === PrismaScalarTypes.Boolean) return Element.checkbox
@@ -270,6 +271,10 @@ export const getMultipleRelationFields = (fields: Field[]) => {
     return fields.filter((field) => field.isRelation && field.isList)
 }
 
+export const getRelationFieldsWithCustomTypes = (fields: Field[]) => {
+    return fields.filter((field) => field.isRelation && !PrismaScalarTypes[field.type])
+}
+
 export const getAllRelations = (fields: Field[]) => {
     return fields.filter((field) => field.isRelation)
 }
@@ -292,4 +297,16 @@ export const excludeNonRequiredFields = (fields: Field[]) => {
 
 export const makePlural = (name: string) => {
     return pluralize.plural(name)
+}
+
+export const manyToManyRelations = (fields: Field[]) => {
+    return fields
+        .filter((field) => field.isList && !PrismaScalarTypes[field.type])
+        .map((field) => {
+            return {
+                ...field,
+                relatedModelName: field.type.replace('[]', '').replace('?', ''),
+                idField: getIdField(field.relatedModel?.fields || []),
+            }
+        })
 }
