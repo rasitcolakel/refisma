@@ -1,5 +1,5 @@
 import React from "react";
-import { Post } from "@prisma/client";
+import { PostSelect } from "@services/PostsService";
 import { useTranslate } from "@refinedev/core";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -9,14 +9,15 @@ import {
   List,
   ShowButton,
   useDataGrid,
+  TagField,
 } from "@refinedev/mui";
 import { DataGrid, GridColumns } from "@mui/x-data-grid";
 
 export default function PostList() {
   const t = useTranslate();
-  const { dataGridProps } = useDataGrid<Post>();
+  const { dataGridProps } = useDataGrid<PostSelect>();
 
-  const columns = React.useMemo<GridColumns<Post>>(
+  const columns = React.useMemo<GridColumns<PostSelect>>(
     () => [
       {
         field: "id",
@@ -47,6 +48,20 @@ export default function PostList() {
         field: "categoryId",
         flex: 1,
         headerName: t("table.categoryId"),
+      },
+      {
+        field: "tags",
+        flex: 1,
+        headerName: t("table.tags"),
+        renderCell: function render({ row }) {
+          return (
+            <>
+              {row.tags?.map((item) => (
+                <TagField value={item.name} key={item.id} />
+              ))}
+            </>
+          );
+        },
       },
       {
         field: "actions",

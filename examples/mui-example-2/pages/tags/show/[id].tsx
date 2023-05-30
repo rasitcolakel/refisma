@@ -3,7 +3,7 @@ import { useTranslate, useShow, GetOneResponse } from "@refinedev/core";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { TagSelect } from "@services/TagsService";
-import { Show } from "@refinedev/mui";
+import { Show, TagField } from "@refinedev/mui";
 import { Typography, Stack } from "@mui/material";
 import { axiosInstance } from "@refinedev/simple-rest";
 import dataProvider from "@refinedev/simple-rest";
@@ -35,6 +35,14 @@ export default function TagCreate({ idData }: Props) {
           {t("table.name")}
         </Typography>
         <Typography>{record?.name}</Typography>
+        <Typography variant="body1" fontWeight="bold" key="Tag-posts">
+          {t("table.posts")}
+        </Typography>
+        <Stack direction="row" spacing={1}>
+          {record?.posts?.map((item) => (
+            <TagField value={item.title} key={item.id} />
+          ))}
+        </Stack>
         <Typography variant="body1" fontWeight="bold" key="Tag-authorId">
           {t("table.authorId")}
         </Typography>

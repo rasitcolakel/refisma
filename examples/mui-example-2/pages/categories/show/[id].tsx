@@ -3,7 +3,7 @@ import { useTranslate, useShow, GetOneResponse } from "@refinedev/core";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { CategorySelect } from "@services/CategoriesService";
-import { Show } from "@refinedev/mui";
+import { Show, TagField } from "@refinedev/mui";
 import { Typography, Stack } from "@mui/material";
 import { axiosInstance } from "@refinedev/simple-rest";
 import dataProvider from "@refinedev/simple-rest";
@@ -39,6 +39,14 @@ export default function CategoryCreate({ idData }: Props) {
           {t("table.authorId")}
         </Typography>
         <Typography>{record?.author?.email}</Typography>
+        <Typography variant="body1" fontWeight="bold" key="Category-posts">
+          {t("table.posts")}
+        </Typography>
+        <Stack direction="row" spacing={1}>
+          {record?.posts?.map((item) => (
+            <TagField value={item.title} key={item.id} />
+          ))}
+        </Stack>
       </Stack>
     </Show>
   );

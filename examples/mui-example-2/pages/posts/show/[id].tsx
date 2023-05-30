@@ -3,7 +3,7 @@ import { useTranslate, useShow, GetOneResponse } from "@refinedev/core";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { PostSelect } from "@services/PostsService";
-import { Show } from "@refinedev/mui";
+import { Show, TagField } from "@refinedev/mui";
 import { Typography, Stack } from "@mui/material";
 import { axiosInstance } from "@refinedev/simple-rest";
 import dataProvider from "@refinedev/simple-rest";
@@ -51,6 +51,14 @@ export default function PostCreate({ idData }: Props) {
           {t("table.categoryId")}
         </Typography>
         <Typography>{record?.category?.id}</Typography>
+        <Typography variant="body1" fontWeight="bold" key="Post-tags">
+          {t("table.tags")}
+        </Typography>
+        <Stack direction="row" spacing={1}>
+          {record?.tags?.map((item) => (
+            <TagField value={item.name} key={item.id} />
+          ))}
+        </Stack>
       </Stack>
     </Show>
   );

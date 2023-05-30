@@ -1,5 +1,5 @@
 import React from "react";
-import { Tag } from "@prisma/client";
+import { TagSelect } from "@services/TagsService";
 import { useTranslate } from "@refinedev/core";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -9,14 +9,15 @@ import {
   List,
   ShowButton,
   useDataGrid,
+  TagField,
 } from "@refinedev/mui";
 import { DataGrid, GridColumns } from "@mui/x-data-grid";
 
 export default function TagList() {
   const t = useTranslate();
-  const { dataGridProps } = useDataGrid<Tag>();
+  const { dataGridProps } = useDataGrid<TagSelect>();
 
-  const columns = React.useMemo<GridColumns<Tag>>(
+  const columns = React.useMemo<GridColumns<TagSelect>>(
     () => [
       {
         field: "id",
@@ -27,6 +28,20 @@ export default function TagList() {
         field: "name",
         flex: 1,
         headerName: t("table.name"),
+      },
+      {
+        field: "posts",
+        flex: 1,
+        headerName: t("table.posts"),
+        renderCell: function render({ row }) {
+          return (
+            <>
+              {row.posts?.map((item) => (
+                <TagField value={item.title} key={item.id} />
+              ))}
+            </>
+          );
+        },
       },
       {
         field: "authorId",

@@ -47,11 +47,11 @@ model Category {
 }
 
 model Tag {
-  id       Int     @id @default(autoincrement())
-  name     String?
+  id       Int    @id @default(autoincrement())
+  name     String
   posts    Post[]
   authorId Int?
-  author   User?   @relation(fields: [authorId], references: [id])
+  author   User?  @relation(fields: [authorId], references: [id])
 
   @@index([authorId])
 }
