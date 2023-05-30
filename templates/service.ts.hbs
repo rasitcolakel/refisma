@@ -9,7 +9,6 @@ const {{lowercasedName}} = Prisma.validator<Prisma.{{name}}Args>()({
         {{#each fields}}
             {{#ifAnd this.relatedModel this.isMainRelation}} 
                 {{#if this.relation}}
-                    {{#unless this.isList}}
                         {{this.name}}: { 
                             select:{
                                 {{#each this.relatedModel.fields}} 
@@ -19,7 +18,6 @@ const {{lowercasedName}} = Prisma.validator<Prisma.{{name}}Args>()({
                                 {{/each}} 
                             }
                         }, 
-                    {{/unless}}
                 {{/if}}
             {{else}}
                 {{#ifAndNot this.isRelation this.isList}}

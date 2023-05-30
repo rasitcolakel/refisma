@@ -101,7 +101,7 @@ export const generateRelationFormDependencies = (
     if (type === 'edit' && model) {
         const idField = findIdField(model.fields)
         props.push({
-            type: `${idField.name}Data: GetOneResponse<${model.name}>`,
+            type: `${idField.name}Data: GetOneResponse<${model.name}Select>`,
             name: `${idField.name}Data`,
             resource: makePlural(model.name.toLowerCase()),
             function: 'getOne',
@@ -311,7 +311,8 @@ export const generateImportsForForm = (
     }
 
     imports.push(formElements[type])
-    return imports
+
+    return [...imports]
 }
 
 const getFormField = (fields: MuiField[], element: Element) => {
@@ -336,7 +337,7 @@ const muiViewElements = {
     ],
 }
 
-export const generateImportsForView = (framework: UIFrameworks, singular: boolean = true) => {
+export const generateImportsForView = (framework: UIFrameworks, singular: boolean = true, model: Model) => {
     const imports: string[][] = []
     const formElements = framework === UIFrameworks.MUI ? muiViewElements : muiViewElements
     if (formElements.defaultImports.length > 0) imports.push(formElements.defaultImports[0])
@@ -350,5 +351,12 @@ export const generateImportsForView = (framework: UIFrameworks, singular: boolea
             imports.push(pluralImport)
         }
     }
+
+    for (const field of model.fields) {
+        if (field.isList && field.isRelation && field.relatedModel) {
+            imports.push(['TagField', '@refinedev/mui'])
+        }
+    }
+
     return imports
 }

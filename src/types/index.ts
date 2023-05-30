@@ -38,6 +38,7 @@ export type Repository = {
 export type Model = {
     name: string
     fields: Field[]
+    idField?: Field
 }
 
 export type FormField = Field & {

@@ -116,11 +116,21 @@ export const generateShowFields = (fields: Field[]): Field[] => {
     const excludeFields: string[] = []
 
     const _fields = fields.map((field) => {
-        if (field.isList && field.isRelation) {
-            excludeFields.push(field.name)
-            return field
-        }
-        if (field.relation && field.relatedModel) {
+        if (field.isList && field.isRelation && field.relatedModel) {
+            field.relatedModel = {
+                ...field.relatedModel,
+                idField: getIdField(field.relatedModel.fields),
+            }
+            const excludes = getAllRequiredFields(
+                excludeRelationFields(excludeNonRequiredFields(excludeIdField(field.relatedModel.fields))),
+            )
+
+            if (excludes.length) {
+                field.showName = excludes[0].name
+            } else if (field.relatedModel.idField) {
+                field.showName = field.relatedModel.idField.name
+            }
+        } else if (field.relation && field.relatedModel) {
             let newName = ''
             if (field.relation.type) {
                 excludeFields.push(field.relation.type?.toLowerCase().replace('?', '').replace('[]', ''))
@@ -133,7 +143,6 @@ export const generateShowFields = (fields: Field[]): Field[] => {
                 newName += field.relatedModel.name.toLowerCase()
             }
 
-            const isRelationOptional = field.relation.type?.includes('?')
             const requiredFields = excludeIdField(
                 excludeRelationFields(getAllRequiredFields(field.relatedModel.fields)),
             )

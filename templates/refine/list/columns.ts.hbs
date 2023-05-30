@@ -1,10 +1,26 @@
-const columns = React.useMemo<GridColumns<{{name}}>>(
+const columns = React.useMemo<GridColumns<{{name}}Select>>(
   () => [
     {{#each fields}}
       {
         field: '{{this.name}}',
         flex: 1,
         headerName: t('table.{{this.name}}'),
+        {{#if this.isList }}
+          {{#if this.isRelation }}
+          renderCell: function render({ row }) {
+            return (
+              <>
+                {row.{{name}}?.map((item) => (
+                  <TagField
+                    value={item.{{showName}} }
+                    key={item.{{relatedModel.idField.name}} }
+                  />
+                ))}
+              </>
+            );
+          },
+          {{/if}}
+        {{/if}}
       },
     {{/each}}
     {{#if actions}}

@@ -54,7 +54,7 @@ handlebars.registerHelper('isArray', function (arg1: string, options) {
 
 const listImports = (model: Model) => [
     ['React', 'react', 'true'],
-    [model.name, '@prisma/client'],
+    [`${model.name}Select`, `@services/${makePlural(model.name)}Service`],
     ['useTranslate', '@refinedev/core'],
     ['GetServerSideProps', 'next'],
     ['serverSideTranslations', 'next-i18next/serverSideTranslations'],
@@ -64,13 +64,12 @@ export const generateRefineListPage = (model: Model, templateParams: Repository)
     const template = readFileSync(path.join(refineTemplatesPath, 'list.ts.hbs'), 'utf-8')
     const templateCompiler = handlebars.compile(template)
 
-    const imports = [...listImports(model), ...generateImportsForView(UIFrameworks.MUI, false)]
-
+    const imports = [...listImports(model), ...generateImportsForView(UIFrameworks.MUI, false, model)]
     const compiledTemplate = prettier.format(
         templateCompiler({
             ...templateParams,
             ...model,
-            excludedModels: excludeRelationFields(model.fields),
+            excludedModels: generateShowFields(model.fields),
             actions: true,
             idField: findIdField(model.fields).name,
             imports: mergeSameImports(imports),
@@ -78,6 +77,47 @@ export const generateRefineListPage = (model: Model, templateParams: Repository)
         { parser: 'typescript' },
     )
     writeFile(`pages/${makePlural(model.name.toLowerCase())}/index.tsx`, compiledTemplate)
+
+    return compiledTemplate
+}
+
+const showImports = (model: Model) => [
+    ['React', 'react', 'true'],
+    ['useTranslate', '@refinedev/core'],
+    ['GetServerSideProps', 'next'],
+    ['serverSideTranslations', 'next-i18next/serverSideTranslations'],
+    ['useShow', '@refinedev/core'],
+    [`${model.name}Select`, `@services/${makePlural(model.name)}Service`],
+]
+
+export const generateRefineShowPage = (model: Model, templateParams: Repository) => {
+    const template = readFileSync(path.join(refineTemplatesPath, 'show.ts.hbs'), 'utf-8')
+    const templateCompiler = handlebars.compile(template)
+    const formFields = generateFormFields(
+        fieldsToFormElements(model.fields.filter((field) => !field.isId && !field.isRelation)),
+        model,
+        UIFrameworks.MUI,
+    )
+    const imports = [...showImports(model), ...generateImportsForView(UIFrameworks.MUI, true, model)]
+    const initialResources = generateShowProps(model.fields, model)
+    imports.push(['GetOneResponse', '@refinedev/core'])
+    imports.push(['axiosInstance', '@refinedev/simple-rest'])
+    imports.push(['dataProvider', '@refinedev/simple-rest', 'true'])
+    const compiledTemplate = prettier.format(
+        templateCompiler({
+            ...templateParams,
+            ...model,
+            lowercasedName: model.name.charAt(0).toLowerCase() + model.name.slice(1),
+            fields: generateShowFields(model.fields),
+            actions: true,
+            idField: findIdField(model.fields).name,
+            imports: mergeSameImports(imports),
+            formFields: formFields,
+            initialResources,
+        }),
+        { parser: 'typescript' },
+    )
+    writeFile(`pages/${makePlural(model.name.toLowerCase())}/show/[id].tsx`, compiledTemplate)
 
     return compiledTemplate
 }
@@ -90,7 +130,7 @@ const createImports = (model: Model) => [
     ['serverSideTranslations', 'next-i18next/serverSideTranslations'],
     ['useForm', '@refinedev/react-hook-form'],
     ['Controller', 'react-hook-form'],
-    [model.name, '@prisma/client'],
+    [`${model.name}Select`, `@services/${makePlural(model.name)}Service`],
 ]
 
 export const generateRefineFormPage = (
@@ -103,7 +143,7 @@ export const generateRefineFormPage = (
     const formElements = fieldsToFormElements(model.fields.filter((field) => !field.isId && !field.isRelation))
     const manyToManyFields = fieldsToFormElements(manyToManyRelations(model.fields)) || null
     const formFields = generateFormFields([...formElements, ...manyToManyFields], model, UIFrameworks.MUI, type)
-    const formImports = generateImportsForForm(formElements, UIFrameworks.MUI, type)
+    const formImports = [...generateImportsForForm(formElements, UIFrameworks.MUI, type)]
     const imports = [...createImports(model), ...formImports]
     const relations = getSingleRelationFields(model.fields)
     if (relations.length > 0) {
@@ -126,7 +166,6 @@ export const generateRefineFormPage = (
         }
     }
     const relationFields = generateRelationFormDependencies([...relations, ...manyToManyFields], type, model)
-
     const compiledTemplate = prettier.format(
         templateCompiler({
             ...templateParams,
@@ -147,47 +186,6 @@ export const generateRefineFormPage = (
     } else {
         writeFile(`pages/${makePlural(model.name.toLowerCase())}/edit/[id].tsx`, compiledTemplate)
     }
-
-    return compiledTemplate
-}
-
-const showImports = (model: Model) => [
-    ['React', 'react', 'true'],
-    ['useTranslate', '@refinedev/core'],
-    ['GetServerSideProps', 'next'],
-    ['serverSideTranslations', 'next-i18next/serverSideTranslations'],
-    ['useShow', '@refinedev/core'],
-    [`${model.name}Select`, `@services/${makePlural(model.name)}Service`],
-]
-
-export const generateRefineShowPage = (model: Model, templateParams: Repository) => {
-    const template = readFileSync(path.join(refineTemplatesPath, 'show.ts.hbs'), 'utf-8')
-    const templateCompiler = handlebars.compile(template)
-    const formFields = generateFormFields(
-        fieldsToFormElements(model.fields.filter((field) => !field.isId && !field.isRelation)),
-        model,
-        UIFrameworks.MUI,
-    )
-    const imports = [...showImports(model), ...generateImportsForView(UIFrameworks.MUI, true)]
-    const initialResources = generateShowProps(model.fields, model)
-    imports.push(['GetOneResponse', '@refinedev/core'])
-    imports.push(['axiosInstance', '@refinedev/simple-rest'])
-    imports.push(['dataProvider', '@refinedev/simple-rest', 'true'])
-    const compiledTemplate = prettier.format(
-        templateCompiler({
-            ...templateParams,
-            ...model,
-            lowercasedName: model.name.charAt(0).toLowerCase() + model.name.slice(1),
-            fields: generateShowFields(model.fields),
-            actions: true,
-            idField: findIdField(model.fields).name,
-            imports: mergeSameImports(imports),
-            formFields: formFields,
-            initialResources,
-        }),
-        { parser: 'typescript' },
-    )
-    writeFile(`pages/${makePlural(model.name.toLowerCase())}/show/[id].tsx`, compiledTemplate)
 
     return compiledTemplate
 }

@@ -22,7 +22,13 @@ export default function {{name}}Create({
             getValues,
         {{/if}}
         formState: { errors },
-    } = useForm<{{name}}, HttpError>();
+    } = useForm<{{name}}Select, HttpError>({{#ifEquals action "edit"}} {
+        refineCoreProps: {
+            queryOptions: {
+                initialData: {{idField}}Data
+            },
+        },
+    } {{/ifEquals}});
 
     {{{relationFields.[1]}}}
 

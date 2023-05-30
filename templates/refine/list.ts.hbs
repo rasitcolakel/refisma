@@ -2,7 +2,7 @@
 
 export default function {{name}}List() {
     const t = useTranslate();
-    const { dataGridProps } = useDataGrid<{{name}}>();
+    const { dataGridProps } = useDataGrid<{{name}}Select>();
 
     {{> columns fields=excludedModels name=name actions=actions idField=idField }}
 
