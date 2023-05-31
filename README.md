@@ -34,6 +34,7 @@ Refisma is a tool to help you create CRUD applications by using Prisma. It gener
   - [x] Create Page
   - [x] Edit Page
   - [x] Show Page
+- [ ] Custom identifier for resources
 
 ## Installation
 
