@@ -143,10 +143,11 @@ export const generateRefineFormPage = (
     const formElements = fieldsToFormElements(model.fields.filter((field) => !field.isId && !field.isRelation))
     const manyToManyFields = fieldsToFormElements(manyToManyRelations(model.fields)) || null
     const formFields = generateFormFields([...formElements, ...manyToManyFields], model, UIFrameworks.MUI, type)
-    const formImports = [...generateImportsForForm(formElements, UIFrameworks.MUI, type)]
+    const formImports = [...generateImportsForForm([...formElements, ...manyToManyFields], UIFrameworks.MUI, type)]
     const imports = [...createImports(model), ...formImports]
     const relations = getSingleRelationFields(model.fields)
-    if (relations.length > 0) {
+    const allRelations = getRelationFieldsWithCustomTypes(model.fields)
+    if (allRelations.length > 0) {
         imports.push(['axiosInstance', '@refinedev/simple-rest'])
         imports.push(['dataProvider', '@refinedev/simple-rest', 'true'])
         imports.push(['GetListResponse', '@refinedev/core'])

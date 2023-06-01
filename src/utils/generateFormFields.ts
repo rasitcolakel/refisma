@@ -265,13 +265,19 @@ const muiFields: MuiField[] = [
         element: Element.autocomplete,
         name: 'Autocomplete',
         import: '@mui/material',
-        dependentImports: [['useAutocomplete', '@refinedev/mui']],
+        dependentImports: [
+            ['useAutocomplete', '@refinedev/mui'],
+            ['TextField', '@mui/material'],
+        ],
     },
     {
         element: Element.select,
         name: 'Autocomplete',
         import: '@mui/material',
-        dependentImports: [['useAutocomplete', '@refinedev/mui']],
+        dependentImports: [
+            ['useAutocomplete', '@refinedev/mui'],
+            ['TextField', '@mui/material'],
+        ],
     },
 ]
 

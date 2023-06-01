@@ -28,13 +28,23 @@ Refisma is a tool to help you create CRUD applications by using Prisma. It gener
 - [ ] Generating services and endpoints for Relations
   - [x] One to One
   - [x] One to Many
-  - [ ] Many to Many
+  - [x] Many to Many
 - [x] Refine Pages (Only for Next.js & MaterialUI)
   - [x] List Page
   - [x] Create Page
   - [x] Edit Page
   - [x] Show Page
 - [ ] Custom identifier for resources
+- [ ] Providers
+  - [ ] Auth
+  - [ ] i18n
+  - [ ] Access Control
+- [ ] Compiler For Refisma
+  - [ ] hide fields on views (list, create, edit, show)
+  - [ ] fields accessiblities (list, create, edit, show)
+- [ ] Middlewares
+  - [x] Zod validation
+  - [ ] Access Control
 
 ## Installation
 
