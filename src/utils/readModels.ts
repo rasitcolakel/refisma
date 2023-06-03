@@ -1,18 +1,45 @@
 // read models from  prisma/schema.prisma
 
-import { readFileSync } from 'fs'
-import { Field, KeyOf, Model, PrismaRelationArgs } from '../types'
+import { promises } from 'fs'
+import { Field, FieldVisibility, KeyOf, Model, PrismaRelationArgs } from '../types'
 import { PrismaScalarTypes, TPrismaScalarTypes } from '../enums'
 import { relationMapper } from '.'
 
-export const getModels = (): Model[] => {
-    const schema = readFileSync('prisma/schema.prisma', 'utf-8')
-    const models = parseSchema(schema)
+type GetModelsType = {
+    models: Model[]
+    isRefisma: boolean
+}
+export const getModels = async (): Promise<GetModelsType> => {
+    // check refisma file exists
+    try {
+        await promises.access('prisma/schema.refisma')
 
-    return models
+        const schema = await promises.readFile('prisma/schema.refisma', 'utf-8')
+        return {
+            models: parseSchema(schema, true),
+            isRefisma: true,
+        }
+    } catch (error: any) {
+        if (error.code === 'ENOENT') {
+            try {
+                await promises.access('prisma/schema.prisma')
+                const schema = await promises.readFile('prisma/schema.prisma', 'utf-8')
+                return {
+                    models: parseSchema(schema, false),
+                    isRefisma: false,
+                }
+            } catch (error: any) {
+                if (error.code === 'ENOENT') {
+                    throw new Error('schema.prisma not found')
+                }
+                throw error
+            }
+        }
+        throw error
+    }
 }
 
-export const parseSchema = (schema: string): Model[] => {
+export const parseSchema = (schema: string, isRefisma: boolean): Model[] => {
     const models: Model[] = []
 
     const lines = schema.split('\n')
@@ -39,7 +66,7 @@ export const parseSchema = (schema: string): Model[] => {
 
         if (line.startsWith('  ')) {
             if (model) {
-                const field = parseField(line)
+                const field = parseField(line, isRefisma)
                 model.fields.push(field)
             }
         }
@@ -53,7 +80,7 @@ export const parseSchema = (schema: string): Model[] => {
     })
 }
 
-const parseField = (line: string): Field => {
+const parseField = (line: string, isRefisma: boolean): Field => {
     // replace all spaces with a single space
     const arrayLine = line.replace(/\s+/g, ' ').trim()
 
@@ -98,9 +125,55 @@ const parseField = (line: string): Field => {
     const isId = options.includes('@id')
     const isUpdatedAt = options.includes('@updatedAt')
     const isCreatedAt = options.includes('@createdAt')
-    const isOptional = type.includes('?')
     const isReadOnly = options.includes('@readOnly')
     const isGenerated = options.includes('@generated')
+    const visibility: FieldVisibility = {
+        all: true,
+        list: true,
+        show: true,
+        edit: true,
+        create: true,
+    }
+    if (isRefisma) {
+        /*
+         * @visibility[all] -> default
+         * @visibility[hidden] -> hide everywhere
+         * @visibility[list, show] -> show in list and show
+         * */
+
+        const visibilityOptions = options.find((option) => option.startsWith('@visibility'))
+        if (visibilityOptions) {
+            const visibilityArgs = visibilityOptions
+                .split('@visibility')[1]
+                .split(',')[0]
+                .replace('(', '')
+                .replace(')', '')
+                .split(',') as KeyOf<
+                typeof visibility & {
+                    all: boolean
+                    hidden: boolean
+                }
+            >[]
+            if (visibilityArgs.includes('hidden')) {
+                visibility.all = false
+                visibility.show = false
+                visibility.list = false
+                visibility.edit = false
+                visibility.create = false
+            } else visibility.all = false
+            visibility.show = false
+            visibility.list = false
+            visibility.edit = false
+            visibility.create = false
+            visibilityArgs.forEach((arg) => {
+                if (arg === 'all' || arg === 'hidden') {
+                    return
+                }
+
+                visibility[arg] = true
+            })
+        }
+    }
 
     return {
         name,
@@ -114,8 +187,8 @@ const parseField = (line: string): Field => {
         isId,
         isUpdatedAt,
         isCreatedAt,
-        isOptional: customListType ? true : isOptional,
         isReadOnly,
         isGenerated,
+        visibility,
     }
 }

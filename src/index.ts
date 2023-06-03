@@ -6,7 +6,7 @@ import { generateService } from './utils/generateService'
 import ora from 'ora'
 
 export const main = async () => {
-    const models = getModels()
+    const { models, isRefisma } = await getModels()
     const response = (await prompt({
         type: 'multiselect',
         name: 'model',

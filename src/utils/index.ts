@@ -100,7 +100,7 @@ export const generateZodSchema = (fields: Field[]): ZodModel[] => {
                 name: field.name,
                 type: prismaTypeToZod(field.type.replace('?', '') as TPrismaScalarTypes),
                 required: field.isRequired,
-                optional: field.isOptional,
+                optional: !field.isRequired,
                 id: field.isId,
             }
         })

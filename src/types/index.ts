@@ -71,10 +71,18 @@ export type Field = {
     isId: boolean
     isUpdatedAt: boolean
     isCreatedAt: boolean
-    isOptional: boolean
     isReadOnly: boolean
     isGenerated: boolean
     isMainRelation?: boolean
+    visibility: FieldVisibility
+}
+
+export type FieldVisibility = {
+    all: boolean
+    list?: boolean
+    show?: boolean
+    edit?: boolean
+    create?: boolean
 }
 
 export type ZodModel = {
