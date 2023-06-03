@@ -1,24 +1,26 @@
 {{#each fields}}
-{{#if this.isList }}
-    {{#if this.isRelation }}
-    <Typography variant="body1" fontWeight="bold" key="{{@root.name}}-{{this.name}}">
-        {t('table.{{this.name}}')} 
-    </Typography>
-    <Stack direction="row" spacing={1}>
-      {record?.{{name}}?.map((item) => (
-        <TagField
-          value={item.{{showName}} }
-          key={item.{{relatedModel.idField.name}} }
-        />
-      ))}
-    </Stack>
-    {{/if}}
-{{else}}
-<Typography variant="body1" fontWeight="bold" key="{{@root.name}}-{{this.name}}">
-        {t('table.{{this.name}}')} 
-</Typography>
-<Typography>
-    {record?.{{this.showName}} }
-</Typography>
+{{#if this.visibility.show}}
+  {{#if this.isList }}
+      {{#if this.isRelation }}
+      <Typography variant="body1" fontWeight="bold" key="{{@root.name}}-{{this.name}}">
+          {t('table.{{this.name}}')} 
+      </Typography>
+      <Stack direction="row" spacing={1}>
+        {record?.{{name}}?.map((item) => (
+          <TagField
+            value={item.{{showName}} }
+            key={item.{{relatedModel.idField.name}} }
+          />
+        ))}
+      </Stack>
+      {{/if}}
+  {{else}}
+  <Typography variant="body1" fontWeight="bold" key="{{@root.name}}-{{this.name}}">
+          {t('table.{{this.name}}')} 
+  </Typography>
+  <Typography>
+      {record?.{{this.showName}} }
+  </Typography>
+  {{/if}}
 {{/if}}
 {{/each}}

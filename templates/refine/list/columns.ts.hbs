@@ -1,6 +1,7 @@
 const columns = React.useMemo<GridColumns<{{name}}Select>>(
   () => [
     {{#each fields}}
+      {{#if this.visibility.list}}
       {
         field: '{{this.name}}',
         flex: 1,
@@ -22,6 +23,7 @@ const columns = React.useMemo<GridColumns<{{name}}Select>>(
           {{/if}}
         {{/if}}
       },
+      {{/if}}
     {{/each}}
     {{#if actions}}
       {
