@@ -64,16 +64,21 @@ export const generateRelationFormDependencies = (
     const props: NextPropsType[] = []
 
     const autocompleteOptions = fields.map((field) => {
+        if (type === 'edit' && field.visibility.edit === false) {
+            return
+        } else if (type === 'create' && field.visibility.create === false) {
+            return
+        }
         let name = (field?.relation?.fields && field?.relation?.fields[0]) || ''
-        const type = field.type.replace('[]', '').replace('?', '')
+        const fieldType = field.type.replace('[]', '').replace('?', '')
         const resourceUpper = field.type.replace('[]', '').replace('?', '')
         const resource = makePlural(resourceUpper.toLowerCase())
-        const customType = !PrismaScalarTypes[type as keyof typeof PrismaScalarTypes]
+        const customType = !PrismaScalarTypes[fieldType as keyof typeof PrismaScalarTypes]
         if (customType && field.isList) {
             name = field.name
         }
         props.push({
-            type: `${name}Data: GetListResponse<${type}>`,
+            type: `${name}Data: GetListResponse<${fieldType}>`,
             name: `${name}Data`,
             resource,
             function: 'getList',
@@ -118,6 +123,11 @@ function generateMUIFormFields(fields: FormField[], model: Model, type: 'create'
     const idFieldOfModel = findIdField(model.fields)
 
     for (const field of fields) {
+        if (type === 'edit' && field.visibility.edit === false) {
+            continue
+        } else if (type === 'create' && field.visibility.create === false) {
+            continue
+        }
         if (field.elementType === 'text' || field.elementType === 'number') {
             items.push(
                 insideOfController(

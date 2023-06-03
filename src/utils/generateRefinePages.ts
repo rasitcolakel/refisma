@@ -6,6 +6,7 @@ import path from 'path'
 import {
     excludeRelationFields,
     fieldsToFormElements,
+    filterFieldsByVisibility,
     findIdField,
     generateShowFields,
     getRelationFieldsWithCustomTypes,
@@ -141,7 +142,7 @@ export const generateRefineFormPage = (
     const template = readFileSync(path.join(refineTemplatesPath, 'create.ts.hbs'), 'utf-8')
     const templateCompiler = handlebars.compile(template)
     const formElements = fieldsToFormElements(model.fields.filter((field) => !field.isId && !field.isRelation))
-    const manyToManyFields = fieldsToFormElements(manyToManyRelations(model.fields)) || null
+    const manyToManyFields = fieldsToFormElements(filterFieldsByVisibility(manyToManyRelations(model.fields), type))
     const formFields = generateFormFields([...formElements, ...manyToManyFields], model, UIFrameworks.MUI, type)
     const formImports = [...generateImportsForForm([...formElements, ...manyToManyFields], UIFrameworks.MUI, type)]
     const imports = [...createImports(model), ...formImports]

@@ -21,6 +21,7 @@ export type Repository = {
         isSingular: boolean
         name: TMethodNames
         method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
+        visibilityName?: keyof FieldVisibility
         customName?: string
         params: Param[]
         requestParams: {

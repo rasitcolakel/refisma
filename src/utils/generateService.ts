@@ -38,6 +38,12 @@ handlebars.registerHelper('ifAndNot' as any, function (arg1, arg2, options) {
     return !arg1 && !arg2 ? options.fn(this) : options.inverse(this)
 })
 
+handlebars.registerHelper('ifVisible', function (arg1, arg2, options) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    return arg1[arg2] === true ? options.fn(this) : options.inverse(this)
+})
+
 export const generateService = async (model: Model, UIFramework: UIFrameworks) => {
     const template = readFileSync(path.join(__dirname, '../../templates', 'service.ts.hbs'), 'utf-8')
     const templateCompiler = handlebars.compile(template)
@@ -63,6 +69,7 @@ export const generateService = async (model: Model, UIFramework: UIFrameworks) =
                 isSingular: false,
                 method: 'POST',
                 name: MethodNames.create,
+                visibilityName: 'create',
                 params: [
                     {
                         name: 'body',
@@ -81,6 +88,7 @@ export const generateService = async (model: Model, UIFramework: UIFrameworks) =
             {
                 isSingular: true,
                 name: MethodNames.getById,
+                visibilityName: 'show',
                 method: 'GET',
                 params: [
                     {
@@ -107,6 +115,7 @@ export const generateService = async (model: Model, UIFramework: UIFrameworks) =
                 isSingular: false,
                 method: 'GET',
                 name: MethodNames.findMany,
+                visibilityName: 'list',
                 params: [],
                 requestParams: [],
             },
@@ -114,6 +123,7 @@ export const generateService = async (model: Model, UIFramework: UIFrameworks) =
                 isSingular: true,
                 method: 'PATCH',
                 name: MethodNames.update,
+                visibilityName: 'edit',
                 params: [
                     {
                         name: idField.name,
@@ -169,7 +179,7 @@ export const generateService = async (model: Model, UIFramework: UIFrameworks) =
                 ],
             },
         ],
-        fields: { ...model.fields },
+        fields: model.fields,
         getCounts: model.fields.filter((field) => field.isList).map((field) => field.name).length > 0,
         zodSchema: generateZodSchema(model.fields),
     }

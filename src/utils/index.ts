@@ -1,7 +1,7 @@
 import { UIFrameworks } from '@refinedev/cli'
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs'
 import path from 'path'
-import { Element, Field, FormField, Model } from '../types'
+import { Element, Field, FieldVisibility, FormField, KeyOf, Model } from '../types'
 import { PrismaScalarTypes, TPrismaScalarTypes } from '../enums'
 import { ZodModel } from '../types'
 import pluralize from 'pluralize'
@@ -318,4 +318,8 @@ export const manyToManyRelations = (fields: Field[]) => {
                 idField: getIdField(field.relatedModel?.fields || []),
             }
         })
+}
+
+export const filterFieldsByVisibility = (fields: Field[], prop: keyof FieldVisibility, value: boolean = true) => {
+    return fields.filter((field) => field.visibility[prop] === value)
 }
