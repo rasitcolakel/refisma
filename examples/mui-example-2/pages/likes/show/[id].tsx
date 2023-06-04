@@ -2,20 +2,20 @@ import React from "react";
 import { useTranslate, useShow, GetOneResponse } from "@refinedev/core";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { TagSelect } from "@services/TagsService";
+import { LikeSelect } from "@services/LikesService";
 import { Show, TagField } from "@refinedev/mui";
 import { Typography, Stack } from "@mui/material";
 import { axiosInstance } from "@refinedev/simple-rest";
 import dataProvider from "@refinedev/simple-rest";
 
 interface Props {
-  idData: GetOneResponse<TagSelect>;
+  idData: GetOneResponse<LikeSelect>;
 }
 
-export default function TagCreate({ idData }: Props) {
+export default function LikeCreate({ idData }: Props) {
   const t = useTranslate();
-  const { queryResult } = useShow<TagSelect>({
-    resource: "tags",
+  const { queryResult } = useShow<LikeSelect>({
+    resource: "likes",
     queryOptions: {
       initialData: idData,
     },
@@ -27,15 +27,15 @@ export default function TagCreate({ idData }: Props) {
   return (
     <Show isLoading={isLoading}>
       <Stack gap={1}>
-        <Typography variant="body1" fontWeight="bold" key="Tag-id">
+        <Typography variant="body1" fontWeight="bold" key="Like-id">
           {t("table.id")}
         </Typography>
         <Typography>{record?.id}</Typography>
-        <Typography variant="body1" fontWeight="bold" key="Tag-name">
-          {t("table.name")}
+        <Typography variant="body1" fontWeight="bold" key="Like-postId">
+          {t("table.postId")}
         </Typography>
-        <Typography>{record?.name}</Typography>
-        <Typography variant="body1" fontWeight="bold" key="Tag-authorId">
+        <Typography>{record?.post?.title}</Typography>
+        <Typography variant="body1" fontWeight="bold" key="Like-authorId">
           {t("table.authorId")}
         </Typography>
         <Typography>{record?.author?.email}</Typography>
@@ -49,7 +49,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     process.env.NEXT_PUBLIC_SERVER_API_URL as string,
     axiosInstance
   ).getOne({
-    resource: "tags",
+    resource: "likes",
     id: context.query.id as string,
   });
 

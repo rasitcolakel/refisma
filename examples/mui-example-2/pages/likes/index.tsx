@@ -1,5 +1,5 @@
 import React from "react";
-import { CategorySelect } from "@services/CategoriesService";
+import { LikeSelect } from "@services/LikesService";
 import { useTranslate } from "@refinedev/core";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
@@ -13,11 +13,11 @@ import {
 } from "@refinedev/mui";
 import { DataGrid, GridColumns } from "@mui/x-data-grid";
 
-export default function CategoryList() {
+export default function LikeList() {
   const t = useTranslate();
-  const { dataGridProps } = useDataGrid<CategorySelect>();
+  const { dataGridProps } = useDataGrid<LikeSelect>();
 
-  const columns = React.useMemo<GridColumns<CategorySelect>>(
+  const columns = React.useMemo<GridColumns<LikeSelect>>(
     () => [
       {
         field: "id",
@@ -25,9 +25,9 @@ export default function CategoryList() {
         headerName: t("table.id"),
       },
       {
-        field: "name",
+        field: "postId",
         flex: 1,
-        headerName: t("table.name"),
+        headerName: t("table.postId"),
       },
       {
         field: "authorId",

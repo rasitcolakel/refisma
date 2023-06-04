@@ -18,10 +18,10 @@
     "@mui/x-data-grid": "^5.12.1",
     "@prisma/client": "^4.14.0",
     "@refinedev/cli": "^2.5.5",
-    "@refinedev/core": "^4.16.0",
-    "@refinedev/inferencer": "^3.5.4",
+    "@refinedev/core": "^4.18.0",
+    "@refinedev/inferencer": "^3.5.8",
     "@refinedev/kbar": "^1.1.0",
-    "@refinedev/mui": "^4.16.4",
+    "@refinedev/mui": "^4.18.2",
     "@refinedev/nextjs-router": "^5.3.0",
     "@refinedev/react-hook-form": "^4.4.0",
     "@refinedev/simple-rest": "^4.5.0",
@@ -35,7 +35,7 @@
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-hook-form": "^7.43.9",
-    "refisma": "0.0.37",
+    "refisma": "0.0.40",
     "zod": "^3.21.4"
   },
   "devDependencies": {

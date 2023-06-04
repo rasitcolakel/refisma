@@ -1,88 +1,61 @@
-import React from "react";
-import { useTranslate, useShow, GetOneResponse } from "@refinedev/core";
-import { GetServerSideProps } from "next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { PostSelect } from "@services/PostsService";
-import { Show, TagField } from "@refinedev/mui";
-import { Typography, Stack } from "@mui/material";
-import { axiosInstance } from "@refinedev/simple-rest";
-import dataProvider from "@refinedev/simple-rest";
+import React from 'react'
+import { InferField, MuiInferencer } from '@refinedev/inferencer/mui'
 
-interface Props {
-  idData: GetOneResponse<PostSelect>;
+export default function PostList() {
+    return (
+        <MuiInferencer
+            resource="posts"
+            action="show"
+            fieldTransformer={(field) => {
+                const fieldTransforms: InferField[] = [
+                    {
+                        key: 'categoryId',
+                        type: 'relation',
+                        multiple: false,
+                        resource: {
+                            name: 'categories',
+                            route: '/categories',
+                        },
+                    },
+                    {
+                        key: 'authorId',
+                        type: 'relation',
+                        multiple: false,
+                        resource: {
+                            name: 'users',
+                            route: '/users',
+                        },
+                    },
+                    {
+                        key: 'tags',
+                        multiple: true,
+                        priority: 1,
+                        type: 'relation',
+                        relation: true,
+                        accessor: 'id',
+                        resource: {
+                            name: 'tags',
+                            route: '/tags',
+                        },
+                    },
+                    {
+                        key: 'content',
+                        type: 'text',
+                        relation: false,
+                        multiple: false,
+                    },
+                ]
+
+                const findField = fieldTransforms.find((f) => f.key === field.key)
+
+                if (findField) {
+                    return {
+                        ...findField,
+                    }
+                }
+
+                return field
+            }}
+        />
+    )
 }
-
-export default function PostCreate({ idData }: Props) {
-  const t = useTranslate();
-  const { queryResult } = useShow<PostSelect>({
-    resource: "posts",
-    queryOptions: {
-      initialData: idData,
-    },
-  });
-  const { data, isLoading } = queryResult;
-
-  const record = data?.data;
-
-  return (
-    <Show isLoading={isLoading}>
-      <Stack gap={1}>
-        <Typography variant="body1" fontWeight="bold" key="Post-id">
-          {t("table.id")}
-        </Typography>
-        <Typography>{record?.id}</Typography>
-        <Typography variant="body1" fontWeight="bold" key="Post-title">
-          {t("table.title")}
-        </Typography>
-        <Typography>{record?.title}</Typography>
-        <Typography variant="body1" fontWeight="bold" key="Post-content">
-          {t("table.content")}
-        </Typography>
-        <Typography>{record?.content}</Typography>
-        <Typography variant="body1" fontWeight="bold" key="Post-published">
-          {t("table.published")}
-        </Typography>
-        <Typography>{record?.published}</Typography>
-        <Typography variant="body1" fontWeight="bold" key="Post-authorId">
-          {t("table.authorId")}
-        </Typography>
-        <Typography>{record?.author?.email}</Typography>
-        <Typography variant="body1" fontWeight="bold" key="Post-categoryId">
-          {t("table.categoryId")}
-        </Typography>
-        <Typography>{record?.category?.id}</Typography>
-        <Typography variant="body1" fontWeight="bold" key="Post-tags">
-          {t("table.tags")}
-        </Typography>
-        <Stack direction="row" spacing={1}>
-          {record?.tags?.map((item) => (
-            <TagField value={item.name} key={item.id} />
-          ))}
-        </Stack>
-      </Stack>
-    </Show>
-  );
-}
-
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const idData = await dataProvider(
-    process.env.NEXT_PUBLIC_SERVER_API_URL as string,
-    axiosInstance
-  ).getOne({
-    resource: "posts",
-    id: context.query.id as string,
-  });
-
-  if (!idData.data) {
-    return {
-      notFound: true,
-    };
-  }
-
-  return {
-    props: {
-      ...(await serverSideTranslations(context.locale ?? "en", ["common"])),
-      idData,
-    },
-  };
-};

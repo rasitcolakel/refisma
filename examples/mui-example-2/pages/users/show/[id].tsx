@@ -47,22 +47,6 @@ export default function UserCreate({ idData }: Props) {
             <TagField value={item.title} key={item.id} />
           ))}
         </Stack>
-        <Typography variant="body1" fontWeight="bold" key="User-categories">
-          {t("table.categories")}
-        </Typography>
-        <Stack direction="row" spacing={1}>
-          {record?.categories?.map((item) => (
-            <TagField value={item.id} key={item.id} />
-          ))}
-        </Stack>
-        <Typography variant="body1" fontWeight="bold" key="User-tags">
-          {t("table.tags")}
-        </Typography>
-        <Stack direction="row" spacing={1}>
-          {record?.tags?.map((item) => (
-            <TagField value={item.name} key={item.id} />
-          ))}
-        </Stack>
       </Stack>
     </Show>
   );

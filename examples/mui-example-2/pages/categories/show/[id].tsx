@@ -39,14 +39,6 @@ export default function CategoryCreate({ idData }: Props) {
           {t("table.authorId")}
         </Typography>
         <Typography>{record?.author?.email}</Typography>
-        <Typography variant="body1" fontWeight="bold" key="Category-posts">
-          {t("table.posts")}
-        </Typography>
-        <Stack direction="row" spacing={1}>
-          {record?.posts?.map((item) => (
-            <TagField value={item.title} key={item.id} />
-          ))}
-        </Stack>
       </Stack>
     </Show>
   );

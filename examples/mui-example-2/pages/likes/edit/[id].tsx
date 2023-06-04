@@ -1,13 +1,18 @@
 import React from "react";
-import { useTranslate, HttpError, GetListResponse } from "@refinedev/core";
+import {
+  useTranslate,
+  HttpError,
+  GetListResponse,
+  GetOneResponse,
+} from "@refinedev/core";
 import { GetServerSideProps } from "next";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useForm } from "@refinedev/react-hook-form";
 import { Controller } from "react-hook-form";
-import { CategorySelect } from "@services/CategoriesService";
+import { LikeSelect } from "@services/LikesService";
 import {
-  TextField,
   Autocomplete,
+  TextField,
   FormControl,
   FormLabel,
   Stack,
@@ -15,13 +20,19 @@ import {
 import { useAutocomplete, Create, Edit } from "@refinedev/mui";
 import { axiosInstance } from "@refinedev/simple-rest";
 import dataProvider from "@refinedev/simple-rest";
-import { User, Prisma } from "@prisma/client";
+import { Post, User, Prisma } from "@prisma/client";
 
 interface Props {
+  postIdData: GetListResponse<Post>;
   authorIdData: GetListResponse<User>;
+  idData: GetOneResponse<LikeSelect>;
 }
 
-export default function CategoryCreate({ authorIdData }: Props) {
+export default function LikeCreate({
+  postIdData,
+  authorIdData,
+  idData,
+}: Props) {
   const t = useTranslate();
   const {
     saveButtonProps,
@@ -29,8 +40,31 @@ export default function CategoryCreate({ authorIdData }: Props) {
     register,
     control,
     formState: { errors },
-  } = useForm<CategorySelect, HttpError>();
+  } = useForm<LikeSelect, HttpError>({
+    refineCoreProps: {
+      queryOptions: {
+        initialData: idData,
+      },
+    },
+  });
 
+  const {
+    autocompleteProps: postIdAutocompleteProps,
+    queryResult: postIdQueryResult,
+  } = useAutocomplete<Post>({
+    queryOptions: {
+      initialData: postIdData,
+    },
+    resource: "posts",
+    liveMode: "auto",
+    onSearch: (value: string) => [
+      {
+        field: "search",
+        operator: "eq",
+        value,
+      },
+    ],
+  });
   const {
     autocompleteProps: authorIdAutocompleteProps,
     queryResult: authorIdQueryResult,
@@ -50,16 +84,16 @@ export default function CategoryCreate({ authorIdData }: Props) {
   });
 
   return (
-    <Create isLoading={formLoading} saveButtonProps={saveButtonProps}>
+    <Edit isLoading={formLoading} saveButtonProps={saveButtonProps}>
       <Stack gap="24px">
-        <FormControl key={"name"}>
+        <FormControl key={"postId"}>
           <Controller
             control={control}
-            name="name"
+            name="postId"
             render={({ field }) => (
               <>
                 <FormLabel
-                  required={false}
+                  required={true}
                   sx={{
                     marginBottom: "8px",
                     fontWeight: "700",
@@ -67,20 +101,36 @@ export default function CategoryCreate({ authorIdData }: Props) {
                     color: "text.primary",
                   }}
                 >
-                  {t("table.name")}
+                  {t("table.postId")}
                 </FormLabel>
-                <TextField
+                <Autocomplete
                   {...field}
-                  {...register("name", {
-                    required: false,
+                  {...register("postId", {
+                    required: t("errors.required.field", {
+                      field: t("table.postId"),
+                    }),
                   })}
-                  error={!!(errors as any)?.name}
-                  helperText={(errors as any)?.name?.message}
-                  margin="none"
-                  required
-                  size="small"
-                  variant="outlined"
-                  type="text"
+                  {...postIdAutocompleteProps}
+                  onChange={(_, v: Post | null) => {
+                    if (v) {
+                      field.onChange(v.id);
+                    }
+                  }}
+                  getOptionLabel={(option) => option.title}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      error={!!(errors as any)?.postId}
+                      helperText={(errors as any)?.postId?.message}
+                      margin="none"
+                      required
+                      size="small"
+                      variant="outlined"
+                    />
+                  )}
+                  defaultValue={postIdAutocompleteProps.options.find(
+                    (o) => o.id === idData?.data.postId
+                  )}
                 />
               </>
             )}
@@ -126,28 +176,52 @@ export default function CategoryCreate({ authorIdData }: Props) {
                       variant="outlined"
                     />
                   )}
+                  defaultValue={authorIdAutocompleteProps.options.find(
+                    (o) => o.id === idData?.data.authorId
+                  )}
                 />
               </>
             )}
           />
         </FormControl>
       </Stack>
-    </Create>
+    </Edit>
   );
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
+  const postIdData = await dataProvider(
+    process.env.NEXT_PUBLIC_SERVER_API_URL as string,
+    axiosInstance
+  ).getList({
+    resource: "posts",
+  });
   const authorIdData = await dataProvider(
     process.env.NEXT_PUBLIC_SERVER_API_URL as string,
     axiosInstance
   ).getList({
     resource: "users",
   });
+  const idData = await dataProvider(
+    process.env.NEXT_PUBLIC_SERVER_API_URL as string,
+    axiosInstance
+  ).getOne({
+    resource: "likes",
+    id: context.query.id as string,
+  });
+
+  if (!idData.data) {
+    return {
+      notFound: true,
+    };
+  }
 
   return {
     props: {
       ...(await serverSideTranslations(context.locale ?? "en", ["common"])),
+      postIdData,
       authorIdData,
+      idData,
     },
   };
 };

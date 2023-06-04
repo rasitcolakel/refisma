@@ -15,22 +15,19 @@ import {
 import { useAutocomplete, Create, Edit } from "@refinedev/mui";
 import { axiosInstance } from "@refinedev/simple-rest";
 import dataProvider from "@refinedev/simple-rest";
-import { User, Prisma, Post } from "@prisma/client";
+import { User, Prisma } from "@prisma/client";
 
 interface Props {
   authorIdData: GetListResponse<User>;
-  postsData: GetListResponse<Post>;
 }
 
-export default function TagCreate({ authorIdData, postsData }: Props) {
+export default function TagCreate({ authorIdData }: Props) {
   const t = useTranslate();
   const {
     saveButtonProps,
     refineCore: { formLoading },
     register,
     control,
-    setValue,
-    getValues,
     formState: { errors },
   } = useForm<TagSelect, HttpError>();
 
@@ -51,41 +48,9 @@ export default function TagCreate({ authorIdData, postsData }: Props) {
       },
     ],
   });
-  const {
-    autocompleteProps: postsAutocompleteProps,
-    queryResult: postsQueryResult,
-  } = useAutocomplete<Post>({
-    queryOptions: {
-      initialData: postsData,
-    },
-    resource: "posts",
-    liveMode: "auto",
-    onSearch: (value: string) => [
-      {
-        field: "search",
-        operator: "eq",
-        value,
-      },
-    ],
-  });
 
   return (
-    <Create
-      isLoading={formLoading}
-      saveButtonProps={{
-        ...saveButtonProps,
-        onClick: (e) => {
-          const postsValue = getValues().posts as Post[];
-
-          const posts: Prisma.TagUpdateManyWithoutPostsNestedInput = {
-            connect: postsValue,
-          };
-          setValue("posts", posts);
-
-          saveButtonProps.onClick(e);
-        },
-      }}
-    >
+    <Create isLoading={formLoading} saveButtonProps={saveButtonProps}>
       <Stack gap="24px">
         <FormControl key={"name"}>
           <Controller
@@ -168,52 +133,6 @@ export default function TagCreate({ authorIdData, postsData }: Props) {
             )}
           />
         </FormControl>
-        <FormControl key={"posts"}>
-          <Controller
-            control={control}
-            name="posts"
-            render={({ field }) => (
-              <>
-                <FormLabel
-                  required={false}
-                  sx={{
-                    marginBottom: "8px",
-                    fontWeight: "700",
-                    fontSize: "14px",
-                    color: "text.primary",
-                  }}
-                >
-                  {t("table.posts")}
-                </FormLabel>
-                <Autocomplete
-                  {...field}
-                  {...register("posts", {
-                    required: false,
-                  })}
-                  {...postsAutocompleteProps}
-                  onChange={(_, v: Post[] | null) => {
-                    if (v) {
-                      field.onChange(v);
-                    }
-                  }}
-                  getOptionLabel={(option) => option.title}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      error={!!(errors as any)?.posts}
-                      helperText={(errors as any)?.posts?.message}
-                      margin="none"
-                      required
-                      size="small"
-                      variant="outlined"
-                    />
-                  )}
-                  multiple
-                />
-              </>
-            )}
-          />
-        </FormControl>
       </Stack>
     </Create>
   );
@@ -226,18 +145,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   ).getList({
     resource: "users",
   });
-  const postsData = await dataProvider(
-    process.env.NEXT_PUBLIC_SERVER_API_URL as string,
-    axiosInstance
-  ).getList({
-    resource: "posts",
-  });
 
   return {
     props: {
       ...(await serverSideTranslations(context.locale ?? "en", ["common"])),
       authorIdData,
-      postsData,
     },
   };
 };

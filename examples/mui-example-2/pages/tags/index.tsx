@@ -30,20 +30,6 @@ export default function TagList() {
         headerName: t("table.name"),
       },
       {
-        field: "posts",
-        flex: 1,
-        headerName: t("table.posts"),
-        renderCell: function render({ row }) {
-          return (
-            <>
-              {row.posts?.map((item) => (
-                <TagField value={item.title} key={item.id} />
-              ))}
-            </>
-          );
-        },
-      },
-      {
         field: "authorId",
         flex: 1,
         headerName: t("table.authorId"),
