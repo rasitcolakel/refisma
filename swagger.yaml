@@ -1,0 +1,200 @@
+openapi: 3.0.3
+info:
+    title: Blog API
+    description: API for managing blog posts
+    version: 1.0.0
+servers:
+    - url: /api
+paths:
+    /posts:
+        get:
+            summary: Get all blog posts
+            responses:
+                '200':
+                    description: Successful operation
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: '#/components/schemas/Post'
+        post:
+            summary: Create a new blog post
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/PostInput'
+            responses:
+                '201':
+                    description: Blog post created successfully
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Post'
+
+    /posts/{id}:
+        get:
+            summary: Get a specific blog post by ID
+            parameters:
+                - name: id
+                  in: path
+                  description: ID of the blog post
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                '200':
+                    description: Successful operation
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Post'
+                '404':
+                    description: Blog post not found
+
+        put:
+            summary: Update a specific blog post by ID
+            parameters:
+                - name: id
+                  in: path
+                  description: ID of the blog post
+                  required: true
+                  schema:
+                      type: integer
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/PostInput'
+            responses:
+                '200':
+                    description: Blog post updated successfully
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Post'
+                '404':
+                    description: Blog post not found
+
+        delete:
+            summary: Delete a specific blog post by ID
+            parameters:
+                - name: id
+                  in: path
+                  description: ID of the blog post
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                '204':
+                    description: Blog post deleted successfully
+                '404':
+                    description: Blog post not found
+
+components:
+    schemas:
+        Post:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int64
+                    description: ID of the blog post
+                title:
+                    type: string
+                    description: Title of the blog post
+                content:
+                    type: string
+                    description: Content of the blog post
+                published:
+                    type: boolean
+                    description: Indicates whether the blog post is published or not
+                author:
+                    $ref: '#/components/schemas/User'
+                category:
+                    $ref: '#/components/schemas/Category'
+                tags:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Tag'
+                likes:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Like'
+            required:
+                - title
+                - categoryId
+
+        PostInput:
+            type: object
+            properties:
+                title:
+                    type: string
+                    description: Title of the blog post
+                content:
+                    type: string
+                    description: Content of the blog post
+                published:
+                    type: boolean
+                    description: Indicates whether the blog post is published or not
+                authorId:
+                    type: integer
+                    description: ID of the author
+                categoryId:
+                    type: integer
+                    description: ID of the category
+                tags:
+                    type: array
+                    items:
+                        type: string
+                        description: Tag associated with the blog post
+
+        User:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int64
+                    description: ID of the user
+                name:
+                    type: string
+                    description: Name of the user
+
+        Category:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int64
+                    description: ID of the category
+                name:
+                    type: string
+                    description: Name of the category
+
+        Tag:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int64
+                    description: ID of the tag
+                name:
+                    type: string
+                    description: Name of the tag
+
+        Like:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int64
+                    description: ID of the like
+                userId:
+                    type: integer
+                    description: ID of the user who liked the post
+                postId:
+                    type: integer
+                    description: ID of the post that was liked
