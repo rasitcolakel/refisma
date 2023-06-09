@@ -1,9 +1,15 @@
-// generate a class from a swagger schema object
-
 /**
  * @description
- *
+ * Swagger class
  * */
+
+import { makePlural } from '.'
+import { InferField, InferType } from '../types'
+
+type Resource = {
+    name: string
+    paths: Path[]
+}
 
 type Path = {
     path: string
@@ -17,22 +23,48 @@ type Method = {
     responses: any
 }
 
+type Schemas = {
+    [key: string]: Schema
+}
+
+type Schema = {
+    type: string
+    properties: Properties
+    required?: string[]
+}
+
+type Properties = {
+    [key: string]: {
+        type: InferType
+        format?: string
+        items?: {
+            $ref: string
+        }
+    } & {
+        $ref?: string
+    }
+}
+
 export class Swagger {
     private paths: Path[] = []
     private swagger: any
-    private schemas: any
+    private schemas: Schemas = {}
+    private resources: Resource[] = []
+    private schemaVersion: string
 
     constructor(swagger: any) {
         this.swagger = swagger
         this.setPaths()
         this.setSchemas()
+        this.setResources()
+        this.schemaVersion = this.swagger.openapi || this.swagger.swagger
     }
 
     public getPaths = () => {
         return this.paths
     }
 
-    public setPaths = () => {
+    private setPaths = () => {
         const paths = Object.keys(this.swagger.paths)
         this.paths = paths.map((path) => {
             const pathObject = this.swagger.paths[path]
@@ -42,7 +74,7 @@ export class Swagger {
                 if (responsesObject) {
                     responses = Object.keys(responsesObject).map((response) => {
                         const responseObject = responsesObject[response]
-                        if (!responseObject.content) {
+                        if (responseObject.content) {
                             return {
                                 response,
                                 ...responseObject,
@@ -54,7 +86,6 @@ export class Swagger {
                     })
                 }
                 const requestBody = this.getRequestBodyOfPath(path, method)
-
                 const parameters = pathObject[method].parameters
                 return { method, requestBody, parameters, responses }
             })
@@ -66,16 +97,64 @@ export class Swagger {
         })
     }
 
+    private mergePaths = () => {
+        const paths = this.getPaths().sort((a, b) => a.path.localeCompare(b.path))
+        const resources: Resource[] = []
+
+        for (const path of paths) {
+            const resource = resources.find((resource) => resource.name === this.clearPathName(path.path))
+
+            if (resource) {
+                resource.paths.push({
+                    ...path,
+                    path: path.path.replace(resource.name, ''),
+                })
+            } else {
+                resources.push({
+                    name: this.clearPathName(path.path),
+                    paths: [
+                        {
+                            ...path,
+                            path: path.path.replace(path.path, ''),
+                        },
+                    ],
+                })
+            }
+        }
+
+        return resources
+    }
+
+    public getResources = () => {
+        return this.resources
+    }
+
+    private setResources = () => {
+        this.resources = this.mergePaths()
+    }
+
+    public clearPathName = (path: string) => {
+        const isParam = path.includes('{')
+
+        if (isParam) {
+            const split = path.split('/')
+            const clearPath = split.slice(0, split.length - 1).join('/')
+            return clearPath
+        }
+
+        return path
+    }
+
+    public getSchemaByName = (name: string) => {
+        return this.schemas[name]
+    }
+
     public getSchemas = () => {
         return this.schemas
     }
 
-    public setSchemas = () => {
-        this.schemas = this.swagger.components.schemas
-    }
-
-    public getSchema = (schema: string) => {
-        return this.swagger.components.schemas[schema]
+    private setSchemas = () => {
+        this.schemas = this.swagger.components.schemas as Schemas
     }
 
     public getSchemaProperties = (schema: string) => {
@@ -100,5 +179,89 @@ export class Swagger {
 
     public getResponsesOfPath = (path: string, method: string = 'post') => {
         return this.swagger.paths[path][method].responses
+    }
+
+    public schemaToInterField = (schema: Schema): InferField[] => {
+        const properties = schema.properties
+
+        const fields: InferField[] = Object.keys(properties).map((key) => {
+            const property = properties[key]
+            const relation = !!property.items?.$ref
+            const multiple = property.type === 'array'
+            let field: InferField = {
+                key,
+                type: relation
+                    ? multiple
+                        ? 'array'
+                        : 'object'
+                    : this.propertyTypeToInterType(property.type as string),
+                relation,
+                multiple,
+            }
+
+            if (property.$ref) {
+                const ref = property.$ref.split('/')
+
+                if (ref) {
+                    const schemaName = ref[ref.length - 1]
+                    const schema = this.getSchemaByName(schemaName)
+                    // console.log('schema', schema)
+                    if (schema) {
+                        field = {
+                            ...field,
+                            relation: true,
+                            type: 'relation',
+                        }
+                    }
+                }
+            }
+            if (relation) {
+                const ref = property?.items?.$ref.split('/')
+                if (ref) {
+                    const schemaName = makePlural(ref[ref.length - 1])
+                    field = {
+                        ...field,
+                        relation: true,
+                        type: 'relation',
+                        multiple: true,
+                        resource: {
+                            name: schemaName,
+                            route: schemaName.toLowerCase(),
+                        },
+                    }
+                }
+            }
+
+            return field
+        })
+
+        return fields
+    }
+
+    public propertyTypeToInterType = (type: string, format: string = '') => {
+        switch (type) {
+            case 'string':
+                switch (format) {
+                    case 'date-time':
+                        return 'date'
+                    case 'email':
+                        return 'email'
+                    case 'uri':
+                        return 'url'
+                    case 'binary':
+                        return 'image'
+                    case 'richtext':
+                        return 'richtext'
+                    default:
+                        return 'text'
+                }
+            case 'integer':
+            case 'number':
+                return 'number'
+            case 'boolean':
+                return 'boolean'
+            default:
+                return 'unknown'
+        }
     }
 }

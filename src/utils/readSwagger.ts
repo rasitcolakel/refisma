@@ -16,15 +16,15 @@ type SwaggerField = Pick<Field, 'name' | 'type' | 'isList' | 'isRelation' | 'isR
 
 export const readSwagger = async (file: string) => {
     try {
+        const fileExtension = file.split('.').pop()
+
         await promises.access(file)
         const schema = await promises.readFile(file, 'utf-8')
-        const parsed = parse(schema)
+        const parsed = fileExtension === 'json' ? JSON.parse(schema) : parse(schema)
         const swagger = new Swagger(parsed)
-        const paths = swagger.getPaths()
-        const schemas = swagger.getSchemas()
-        console.log('paths', JSON.stringify({ paths, schemas }))
-
-        // console.log('allPaths', JSON.stringify(allPaths))
+        Object.keys(swagger.getSchemas()).forEach((key) => {
+            console.log(key, swagger.schemaToInterField(swagger.getSchemas()[key]))
+        })
     } catch (error: any) {
         console.log('error', error)
         throw error

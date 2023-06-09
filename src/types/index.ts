@@ -105,3 +105,39 @@ export type PrismaRelationArgs = {
     type?: string
 }
 export type KeyOf<T> = keyof T
+
+// Refine types
+export type InferType =
+    | 'relation'
+    | 'array'
+    | 'object'
+    | 'date'
+    | 'email'
+    | 'image'
+    | 'url'
+    | 'richtext'
+    | 'text'
+    | 'number'
+    | 'boolean'
+    | 'unknown'
+    | `custom_${string}`
+    | null
+
+export type InferField = {
+    key: string
+    type: InferType
+    relation?: boolean
+    multiple?: boolean
+    fieldable?: boolean
+    /**
+     * Accessor to get the value from the record, if its an array it means multiple values should be concatenated
+     */
+    accessor?: string | string[]
+    resource?: {
+        name: string
+        route: string
+    }
+    priority?: number
+    relationInfer?: InferField | null | false
+    canRelation?: boolean
+}

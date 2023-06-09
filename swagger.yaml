@@ -1,17 +1,94 @@
-openapi: 3.0.3
+openapi: 3.0.1
 info:
-    title: Blog API
-    description: API for managing blog posts
+    title: API Documentation
     version: 1.0.0
-servers:
-    - url: /api
 paths:
-    /posts:
+    /users:
         get:
-            summary: Get all blog posts
+            summary: Get all users
             responses:
                 '200':
-                    description: Successful operation
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: '#/components/schemas/User'
+        post:
+            summary: Create a user
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/User'
+            responses:
+                '200':
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/User'
+    /users/{id}:
+        get:
+            summary: Get a user by ID
+            parameters:
+                - name: id
+                  in: path
+                  description: User ID
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                '200':
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/User'
+        put:
+            summary: Update a user
+            parameters:
+                - name: id
+                  in: path
+                  description: User ID
+                  required: true
+                  schema:
+                      type: integer
+                - name: user
+                  in: requestBody
+                  description: User object
+                  required: true
+                  content:
+                      application/json:
+                          schema:
+                              $ref: '#/components/schemas/User'
+            responses:
+                '200':
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/User'
+        delete:
+            summary: Delete a user
+            parameters:
+                - name: id
+                  in: path
+                  description: User ID
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                '204':
+                    description: No Content
+    /posts:
+        get:
+            summary: Get all posts
+            responses:
+                '200':
+                    description: OK
                     content:
                         application/json:
                             schema:
@@ -19,103 +96,120 @@ paths:
                                 items:
                                     $ref: '#/components/schemas/Post'
         post:
-            summary: Create a new blog post
+            summary: Create a post
             requestBody:
                 required: true
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/PostInput'
+                            $ref: '#/components/schemas/Post'
             responses:
-                '201':
-                    description: Blog post created successfully
+                '200':
+                    description: OK
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Post'
-
     /posts/{id}:
         get:
-            summary: Get a specific blog post by ID
+            summary: Get a post by ID
             parameters:
                 - name: id
                   in: path
-                  description: ID of the blog post
+                  description: Post ID
                   required: true
                   schema:
                       type: integer
             responses:
                 '200':
-                    description: Successful operation
+                    description: OK
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Post'
-                '404':
-                    description: Blog post not found
-
         put:
-            summary: Update a specific blog post by ID
+            summary: Update a post
             parameters:
                 - name: id
                   in: path
-                  description: ID of the blog post
+                  description: Post ID
                   required: true
                   schema:
                       type: integer
-            requestBody:
-                required: true
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/PostInput'
+                - name: post
+                  in: requestBody
+                  description: Post object
+                  required: true
+                  content:
+                      application/json:
+                          schema:
+                              $ref: '#/components/schemas/Post'
             responses:
                 '200':
-                    description: Blog post updated successfully
+                    description: OK
                     content:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/Post'
-                '404':
-                    description: Blog post not found
-
         delete:
-            summary: Delete a specific blog post by ID
+            summary: Delete a post
             parameters:
                 - name: id
                   in: path
-                  description: ID of the blog post
+                  description: Post ID
                   required: true
                   schema:
                       type: integer
             responses:
                 '204':
-                    description: Blog post deleted successfully
-                '404':
-                    description: Blog post not found
-
+                    description: No Content
+    /categories:
+        get:
+            summary: Get all categories
+            responses:
+                '200':
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: '#/components/schemas/Category'
+        post:
+            summary: Create a category
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/Category'
+            responses:
+                '200':
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Category'
 components:
     schemas:
-        Post:
+        User:
             type: object
             properties:
                 id:
                     type: integer
-                    format: int64
-                    description: ID of the blog post
-                title:
+                    format: int32
+                email:
                     type: string
-                    description: Title of the blog post
-                content:
+                name:
                     type: string
-                    description: Content of the blog post
-                published:
-                    type: boolean
-                    description: Indicates whether the blog post is published or not
-                author:
-                    $ref: '#/components/schemas/User'
-                category:
-                    $ref: '#/components/schemas/Category'
+                posts:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Post'
+                categories:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Category'
                 tags:
                     type: array
                     items:
@@ -124,77 +218,83 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/Like'
-            required:
-                - title
-                - categoryId
-
-        PostInput:
-            type: object
-            properties:
-                title:
-                    type: string
-                    description: Title of the blog post
-                content:
-                    type: string
-                    description: Content of the blog post
-                published:
-                    type: boolean
-                    description: Indicates whether the blog post is published or not
-                authorId:
-                    type: integer
-                    description: ID of the author
-                categoryId:
-                    type: integer
-                    description: ID of the category
-                tags:
-                    type: array
-                    items:
-                        type: string
-                        description: Tag associated with the blog post
-
-        User:
+        Post:
             type: object
             properties:
                 id:
                     type: integer
-                    format: int64
-                    description: ID of the user
-                name:
+                    format: int32
+                title:
                     type: string
-                    description: Name of the user
-
+                content:
+                    type: string
+                published:
+                    type: boolean
+                author:
+                    $ref: '#/components/schemas/User'
+                authorId:
+                    type: integer
+                    format: int32
+                category:
+                    $ref: '#/components/schemas/Category'
+                categoryId:
+                    type: integer
+                    format: int32
+                tags:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Tag'
+                likes:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Like'
         Category:
             type: object
             properties:
                 id:
                     type: integer
-                    format: int64
-                    description: ID of the category
+                    format: int32
                 name:
                     type: string
-                    description: Name of the category
-
+                authorId:
+                    type: integer
+                    format: int32
+                author:
+                    $ref: '#/components/schemas/User'
+                posts:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Post'
         Tag:
             type: object
             properties:
                 id:
                     type: integer
-                    format: int64
-                    description: ID of the tag
+                    format: int32
                 name:
                     type: string
-                    description: Name of the tag
-
+                posts:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Post'
+                authorId:
+                    type: integer
+                    format: int32
+                author:
+                    $ref: '#/components/schemas/User'
         Like:
             type: object
             properties:
                 id:
                     type: integer
-                    format: int64
-                    description: ID of the like
-                userId:
-                    type: integer
-                    description: ID of the user who liked the post
+                    format: int32
                 postId:
                     type: integer
-                    description: ID of the post that was liked
+                    format: int32
+                post:
+                    $ref: '#/components/schemas/Post'
+                author:
+                    $ref: '#/components/schemas/User'
+                authorId:
+                    type: integer
+                    format: int32
