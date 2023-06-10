@@ -1,3 +1,5 @@
+import { PrismaScalarTypes } from '../../enums'
+
 export type Model = {
     name: string
     fields: Field[]
@@ -5,7 +7,7 @@ export type Model = {
 
 export type Field = {
     name: string
-    type: string
+    type: PrismaScalarTypes
     multiple: boolean
     required: boolean
     relation?: RelationField | boolean

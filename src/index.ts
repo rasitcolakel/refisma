@@ -1,7 +1,7 @@
 import { prompt } from 'enquirer'
 import chalk from 'chalk'
 import { getUIFramework } from './utils'
-import { readPrisma, generateRefinePages } from './utils/read-prisma/index'
+import { readPrisma, generateRefinePages, generateZodSchema } from './utils/read-prisma/index'
 import { readSwagger } from './utils/readSwagger'
 
 type Args = {
@@ -37,6 +37,7 @@ export const main = async () => {
         }
 
         generateRefinePages(selectedModels)
+        generateZodSchema(selectedModels)
     }
 }
 

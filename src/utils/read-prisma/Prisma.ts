@@ -85,7 +85,7 @@ export class Prisma {
         const isScalar = PrismaScalarTypes[rawType as TPrismaScalarTypes]
         return {
             name,
-            type: isScalar || typeof relation !== 'boolean' ? rawType : type,
+            type: (isScalar || typeof relation !== 'boolean' ? rawType : type) as PrismaScalarTypes,
             multiple,
             required: multiple ? false : required,
             relation,
@@ -113,7 +113,7 @@ export class Prisma {
     private parseRelation(line: string): RelationField | undefined {
         if (line.includes('@relation')) {
             const name = line.trim().split(' ')[0]
-            const type = line.trim().split(' ')[1]
+            const type = line.trim().split(' ')[1] as PrismaScalarTypes
             const relation = line.split('@relation')[1].trim()
             const multiple = relation.includes('[]')
             const required = relation.includes('@required')
@@ -168,5 +168,9 @@ export class Prisma {
 
     public getIsRefisma() {
         return this.isRefisma
+    }
+
+    public checkScalarType(type: string) {
+        return PrismaScalarTypes[type as TPrismaScalarTypes]
     }
 }
