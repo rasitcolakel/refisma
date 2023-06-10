@@ -120,14 +120,25 @@ export const generateZodSchema = async (models: Model[]) => {
             export const ${model.name}Body = ${model.name}Schema.omit({
                 id: true,
             });
-
             export type ${model.name}BodyType = z.infer<typeof ${model.name}Body>;
-
             export const ${model.name}Query = ${model.name}Schema.pick({
                 id: true,
             }).merge(PaginationSchema);
-
             export type ${model.name}QueryType = z.infer<typeof ${model.name}Query>;
+            export const ${model.name}QuerySchema = z.object({
+                query: ${model.name}Query,
+            });
+            export type ${model.name}QuerySchemaType = z.infer<typeof ${model.name}QuerySchema>;
+            export const ${model.name}BodySchema = z.object({
+                body: ${model.name}Body,
+            });
+            export type ${model.name}BodySchemaType = z.infer<typeof ${model.name}BodySchema>;
+
+            export const ${model.name}Create = ${model.name}BodySchema;
+            export const ${model.name}Update = ${model.name}BodySchema.merge(${model.name}QuerySchema);
+            export const ${model.name}Delete = ${model.name}QuerySchema;
+            export const ${model.name}FindOne = ${model.name}QuerySchema;
+            export const ${model.name}FindMany = ${model.name}QuerySchema;
         `
 
         imports = imports.replace(/^\s*[\r\n]/gm, '')
