@@ -8,6 +8,14 @@ import prettier from 'prettier'
 import { InferField, InferType } from '../../types'
 import { PrismaScalarTypes } from '../../enums'
 import { prismaTypeToTS } from '..'
+import {
+    generateCreateFunction,
+    generateDeleteFunction,
+    generateFindManyFunction,
+    generateFindOneFunction,
+    generateUpdateFunction,
+} from './serviceFunctions'
+import { makeEndpoints } from './endpointFunctions'
 
 handlebars.registerHelper('lowercase', function (str) {
     if (str && typeof str === 'string') {
@@ -57,11 +65,38 @@ export const readPrisma = async () => {
 }
 
 export const generateZodSchema = async (models: Model[]) => {
-    models.forEach((model) => {
-        let imports = `
-            import * as z from "zod";
+    let imports = `
+    import * as z from "zod";
+    import { PaginationSchema } from "./Schema";
+    `
+    let template = ``
+
+    let importantSchemas = `
+        // IMPORTANT: These schemas may be used in other schemas, so they must defined first
+    `
+
+    // sort by multiple relation count ascending
+    const sorted = models.sort((a, b) => {
+        const aCount = a.fields.filter((field) => field.multiple && field.relation).length
+        const bCount = b.fields.filter((field) => field.multiple && field.relation).length
+        return aCount - bCount
+    })
+
+    sorted.forEach((model) => {
+        const idField = model.fields.find((field) => field.name === 'id')
+
+        if (idField) {
+            importantSchemas += `
+                export const ${model.name}IdSchema = z.object({
+                    id: ${idField.type === 'Int' ? 'z.preprocess(Number, z.number())' : 'z.string()'},
+                });
+                export const ${model.name}SingleQuerySchema = z.object({
+                    query: ${model.name}IdSchema,
+                });
             `
-        let template = `
+        }
+
+        template += `
             export const ${model.name}Schema = z.object({
                 ${model.fields
                     .map((field) => {
@@ -73,7 +108,10 @@ export const generateZodSchema = async (models: Model[]) => {
                             if (field.name === 'id') {
                                 if (field.type === 'Int' || field.type === 'Decimal' || field.type === 'Float') {
                                     property += `
-                                 .preprocess((value) => Array.isArray(value) ? value.map(Number) : Number(value), z.union([z.number(), z.array(z.number())]))`
+                                        .preprocess(
+                                            (value) => Array.isArray(value) ? value.map(Number) : Number(value),
+                                            z.union([z.number(), z.array(z.number())])
+                                        )`
                                 } else {
                                     property += `.union([z.${prismaTypeToTS(field.type)}(), z.array(z.${prismaTypeToTS(
                                         field.type,
@@ -90,16 +128,14 @@ export const generateZodSchema = async (models: Model[]) => {
                             }
                         } else {
                             const rawType = field.type.replace('[]', '').replace('?', '')
-                            imports += `import { ${rawType}Schema } from "./${rawType}Schema";\n`
-
                             if (field.multiple) {
-                                property += `.array(${rawType}Schema.pick({ id: true }))`
+                                property += `.array(${rawType}IdSchema)`
                             } else {
-                                property = `${field.name}: ${rawType}Schema`
+                                property = `${field.name}: ${rawType}IdSchema`
                             }
                         }
 
-                        if (!field.required) {
+                        if (!field.required || field.name === 'id') {
                             property += '.optional()'
                         }
                         return property + ','
@@ -113,41 +149,68 @@ export const generateZodSchema = async (models: Model[]) => {
         // remove empty lines
         template = template.replace(/^\s*[\r\n]/gm, '')
 
-        imports += `
-            import { PaginationSchema } from "./Schema";
-        `
         template += `
             export const ${model.name}Body = ${model.name}Schema.omit({
                 id: true,
             });
-            export type ${model.name}BodyType = z.infer<typeof ${model.name}Body>;
+
             export const ${model.name}Query = ${model.name}Schema.pick({
                 id: true,
             }).merge(PaginationSchema);
-            export type ${model.name}QueryType = z.infer<typeof ${model.name}Query>;
+
             export const ${model.name}QuerySchema = z.object({
                 query: ${model.name}Query,
             });
-            export type ${model.name}QuerySchemaType = z.infer<typeof ${model.name}QuerySchema>;
+
             export const ${model.name}BodySchema = z.object({
                 body: ${model.name}Body,
             });
-            export type ${model.name}BodySchemaType = z.infer<typeof ${model.name}BodySchema>;
 
             export const ${model.name}Create = ${model.name}BodySchema;
-            export const ${model.name}Update = ${model.name}BodySchema.merge(${model.name}QuerySchema);
-            export const ${model.name}Delete = ${model.name}QuerySchema;
-            export const ${model.name}FindOne = ${model.name}QuerySchema;
+            export type ${model.name}CreateType = z.infer<typeof ${model.name}Create>;
+            export const ${model.name}Update = ${model.name}BodySchema.merge(${model.name}SingleQuerySchema);
+            export type ${model.name}UpdateType = z.infer<typeof ${model.name}Update>;
+            export const ${model.name}Delete = ${model.name}SingleQuerySchema;
+            export type ${model.name}DeleteType = z.infer<typeof ${model.name}Delete>;
+            export const ${model.name}FindOne = ${model.name}SingleQuerySchema;
+            export type ${model.name}FindOneType = z.infer<typeof ${model.name}FindOne>;
             export const ${model.name}FindMany = ${model.name}QuerySchema;
+            export type ${model.name}FindManyType = z.infer<typeof ${model.name}FindMany>;
         `
-
-        imports = imports.replace(/^\s*[\r\n]/gm, '')
-        imports += '\n'
-        const compiledTemplate = prettier.format(imports + template, { parser: 'typescript' })
-        writeFile(`schemas/${model.name}Schema.ts`, compiledTemplate)
     })
 
+    imports = imports.replace(/^\s*[\r\n]/gm, '')
+    imports += '\n'
+    const compiledTemplate = prettier.format(imports + importantSchemas + template, { parser: 'typescript' })
+    writeFile(`schemas/index.ts`, compiledTemplate)
+
     generateMainSchema()
+}
+
+export const generateServices = async (models: Model[]) => {
+    const serviceFunctions = ['create', 'update', 'delete', 'findOne', 'findMany']
+
+    models.forEach((model) => {
+        let template = ``
+        const imports = `
+        import { Prisma } from '@prisma/client'
+        import * as ${model.name}Schema from '@schemas/index'
+        import { getPrisma } from './Service'
+
+        const model = getPrisma().${model.name.toLowerCase()};
+        `
+
+        template += generateCreateFunction(model)
+        template += generateUpdateFunction(model)
+        template += generateDeleteFunction(model)
+        template += generateFindOneFunction(model)
+        template += generateFindManyFunction(model)
+
+        const compiledTemplate = prettier.format(imports + template, { parser: 'typescript' })
+        writeFile(`services/${model.name}Service.ts`, compiledTemplate)
+    })
+
+    generateMainService()
 }
 
 const generateMainSchema = async () => {
@@ -156,6 +219,41 @@ const generateMainSchema = async () => {
 
     const compiledTemplate = prettier.format(templateCompiler({}), { parser: 'typescript' })
     writeFile('schemas/Schema.ts', compiledTemplate)
+}
+
+const generateMainService = async () => {
+    const template = await promises.readFile(path.join(serverTemplatesPath, 'service/main.ts.hbs'), 'utf-8')
+    const templateCompiler = handlebars.compile(template)
+
+    const compiledTemplate = prettier.format(templateCompiler({}), { parser: 'typescript' })
+    writeFile('services/Service.ts', compiledTemplate)
+}
+
+export const generateEndpoints = async (models: Model[]) => {
+    const template = await promises.readFile(path.join(serverTemplatesPath, 'endpoint.ts.hbs'), 'utf-8')
+    const templateCompiler = handlebars.compile(template)
+    models.forEach((model) => {
+        const { pluralEndpoints, singularEndpoints } = makeEndpoints(model)
+
+        // Plural endpoints
+        const pluralCompiledTemplate = prettier.format(
+            templateCompiler({
+                ...model,
+                endpoints: pluralEndpoints,
+            }),
+            { parser: 'typescript' },
+        )
+        writeFile(`pages/api/${makePlural(model.name).toLowerCase()}/index.ts`, pluralCompiledTemplate)
+
+        const singularCompiledTemplate = prettier.format(
+            templateCompiler({
+                ...model,
+                endpoints: singularEndpoints,
+            }),
+            { parser: 'typescript' },
+        )
+        writeFile(`pages/api/${makePlural(model.name).toLowerCase()}/[id].ts`, singularCompiledTemplate)
+    })
 }
 
 export const generateRefinePages = async (models: Model[]) => {

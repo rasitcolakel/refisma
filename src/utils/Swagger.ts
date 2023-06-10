@@ -205,7 +205,6 @@ export class Swagger {
                 if (ref) {
                     const schemaName = ref[ref.length - 1]
                     const schema = this.getSchemaByName(schemaName)
-                    // console.log('schema', schema)
                     if (schema) {
                         field = {
                             ...field,

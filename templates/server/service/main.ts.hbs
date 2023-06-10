@@ -1,4 +1,6 @@
-import { PrismaClient } from '@prisma/client
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { PrismaClient } from '@prisma/client'
+import Cors from 'cors'
 
 const getPrisma = () => {
     let prisma: PrismaClient
@@ -15,4 +17,20 @@ const getPrisma = () => {
     return prisma
 }
 
-export { type paginationType, paginationSchema }
+const cors = Cors({
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+})
+
+function runMiddleware(req: any, res: any) {
+    return new Promise((resolve, reject) => {
+        cors(req, res, (result: any) => {
+            if (result instanceof Error) {
+                return reject(result)
+            }
+
+            return resolve(result)
+        })
+    })
+}
+
+export { getPrisma, runMiddleware }

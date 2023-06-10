@@ -1,0 +1,49 @@
+import { NextApiResponse } from 'next'
+import { validateSchema } from 'refisma'
+import { runMiddleware } from '@services/Service'
+import * as {{capitalize name}}Service from "@services/{{capitalize name}}Service";
+import { 
+    {{#each endpoints}}
+        {{this.schemaName}}, {{this.schemaName}}Type{{#unless @last}},{{/unless}}
+    {{/each}}
+} from '@schemas/index'
+
+
+const endpoints = [
+    {{#each endpoints}}
+        {
+            method: '{{this.method}}',
+            handler:  async (req: {{this.schemaName}}Type, res: NextApiResponse) =>
+                        validateSchema({{this.schemaName}})(
+                            req,
+                            res,
+                            async (req: {{this.schemaName}}Type, res: NextApiResponse) => {
+                                try {
+                                    const response = await {{this.functionName}}(req)
+                                    res.status(200).json(response)
+                                } catch (error: any) {
+                                    res.status(500).json({
+                                        message: error.message,
+                                    })
+                                }
+                            },
+                        )
+        },
+    {{/each}}
+]
+
+
+const handler = async (req: any, res: NextApiResponse) => {
+    const endpoint = endpoints.find((endpoint) => endpoint.method === req.method)
+    await runMiddleware(req, res)
+
+    if (!endpoint) {
+        res.status(404).json({
+            message: 'Not found',
+        })
+    } else {
+        endpoint.handler(req, res)
+    }
+}
+
+export default handler
