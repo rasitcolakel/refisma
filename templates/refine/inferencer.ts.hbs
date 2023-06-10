@@ -1,0 +1,18 @@
+import React from 'react'
+import { MuiInferencer } from '@refinedev/inferencer/mui'
+{{{fieldTransformer}}}
+
+const fieldTransformer = (field:any) => {
+    const f= fields.find((f) => f.key === field.key);
+    return f || field;
+}
+
+export default function {{capitalize action}}() {
+    return (
+        <MuiInferencer
+            resource="{{lowercasePlural name}}"
+            action="{{action}}"
+            fieldTransformer={fieldTransformer}
+        />
+    )
+}

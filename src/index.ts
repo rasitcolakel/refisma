@@ -1,9 +1,7 @@
 import { prompt } from 'enquirer'
 import chalk from 'chalk'
 import { getUIFramework } from './utils'
-import { getModels } from './utils/readModels'
-import { generateService } from './utils/generateService'
-import ora from 'ora'
+import { readPrisma, generateRefinePages } from './utils/read-prisma/index'
 import { readSwagger } from './utils/readSwagger'
 
 type Args = {
@@ -12,8 +10,6 @@ type Args = {
 }
 
 export const main = async () => {
-    const { models, isRefisma } = await getModels()
-
     const uiFramework = getUIFramework()
     if (!uiFramework) {
         console.log(chalk.red('No UI framework detected.'))
@@ -25,6 +21,8 @@ export const main = async () => {
     if (type === 'swagger') {
         readSwagger(file)
     } else {
+        const { models, isRefisma } = await readPrisma()
+        console.log(chalk.green(`Found ${models.length} models`))
         const response = (await prompt({
             type: 'multiselect',
             name: 'model',
@@ -38,11 +36,7 @@ export const main = async () => {
             process.exit(1)
         }
 
-        for (const model of selectedModels) {
-            const spinner = ora(`Generating ${model.name} service`).start()
-            await generateService(model, uiFramework)
-            spinner.succeed(`Generated pages for ${model.name}`)
-        }
+        generateRefinePages(selectedModels)
     }
 }
 
