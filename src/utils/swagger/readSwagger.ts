@@ -2,7 +2,7 @@
 
 import { promises } from 'fs'
 import { parse } from 'yamljs'
-import { Model, Field } from '../types'
+import { Model, Field } from '../../types'
 import { Swagger } from './Swagger'
 
 type SwaggerModel = {

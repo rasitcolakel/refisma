@@ -8,12 +8,7 @@ import {
     generateServices,
     generateEndpoints,
 } from './utils/read-prisma/index'
-import { readSwagger } from './utils/readSwagger'
-
-type Args = {
-    file?: string
-    type?: 'prisma' | 'swagger'
-}
+import { readSwagger } from './utils/swagger/readSwagger'
 
 export const main = async () => {
     const uiFramework = getUIFramework()

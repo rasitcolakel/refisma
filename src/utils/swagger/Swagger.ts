@@ -3,8 +3,8 @@
  * Swagger class
  * */
 
-import { makePlural } from '.'
-import { InferField, InferType } from '../types'
+import { makePlural } from '../'
+import { InferField, InferType } from '../../types'
 
 type Resource = {
     name: string
