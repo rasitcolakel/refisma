@@ -298,6 +298,7 @@ const generateRefinePagesForModel = async (model: Model) => {
             templateCompiler({
                 ...model,
                 action: action.name,
+                inferencer: prisma.getInferencer(),
                 fieldTransformer: `
                     const fields = ${JSON.stringify(generateFieldTransformer(model.fields))}
                 `,

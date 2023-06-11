@@ -20,7 +20,7 @@ export const getDependencies = (): string[] => {
     return [...Object.keys(dependencies || {}), ...Object.keys(devDependencies || {})]
 }
 
-export const getUIFramework = (): UIFrameworks | undefined => {
+export const getUIFramework = () => {
     // read dependencies from package.json
     const dependencies = getDependencies()
 

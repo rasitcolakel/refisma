@@ -1,5 +1,5 @@
 import React from 'react'
-import { MuiInferencer } from '@refinedev/inferencer/mui'
+import { {{inferencer.component}} } from '{{inferencer.package}}'
 {{{fieldTransformer}}}
 
 const fieldTransformer = (field:any) => {
@@ -9,7 +9,7 @@ const fieldTransformer = (field:any) => {
 
 export default function {{capitalize action}}() {
     return (
-        <MuiInferencer
+        <{{inferencer.component}}
             resource="{{lowercasePlural name}}"
             action="{{action}}"
             fieldTransformer={fieldTransformer}

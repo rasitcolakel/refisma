@@ -1,11 +1,37 @@
 import { promises } from 'fs'
 import { Field, Model, RelationField, Restrictions } from './types'
 import { PrismaScalarTypes, TPrismaScalarTypes } from '../../enums'
+import { UIFrameworks } from '@refinedev/cli'
+import { getUIFramework } from '..'
+
+const packagesForInferencers = [
+    {
+        name: UIFrameworks.MUI,
+        component: 'MuiInferencer',
+        package: '@refinedev/inferencer/mui',
+    },
+    {
+        name: UIFrameworks.ANTD,
+        component: 'AntdInferencer',
+        package: '@refinedev/inferencer/antd',
+    },
+    {
+        name: UIFrameworks.MANTINE,
+        component: 'MantineInferencer',
+        package: '@refinedev/inferencer/mantine',
+    },
+    {
+        name: UIFrameworks.CHAKRA,
+        component: 'ChakraUIInferencer',
+        package: '@refinedev/inferencer/chakra-ui',
+    },
+]
 
 export class Prisma {
     private models: Model[] = []
     private isRefisma: boolean = false
     private file: string = ''
+    private UIFramework: UIFrameworks = UIFrameworks.MUI
 
     constructor(file?: string) {
         if (file) {
@@ -14,6 +40,7 @@ export class Prisma {
     }
 
     public init = async () => {
+        this.setUIFramework()
         await this.parseSchema()
     }
 
@@ -172,5 +199,17 @@ export class Prisma {
 
     public checkScalarType(type: string) {
         return PrismaScalarTypes[type as TPrismaScalarTypes]
+    }
+
+    public setUIFramework() {
+        this.UIFramework = getUIFramework()
+    }
+
+    public getUIFramework() {
+        return this.UIFramework
+    }
+
+    public getInferencer() {
+        return packagesForInferencers.find((p) => p.name === this.UIFramework)
     }
 }
