@@ -13,6 +13,7 @@ import {
     generateDeleteFunction,
     generateFindManyFunction,
     generateFindOneFunction,
+    generateSelect,
     generateUpdateFunction,
 } from './serviceFunctions'
 import { makeEndpoints } from './endpointFunctions'
@@ -50,6 +51,12 @@ handlebars.registerHelper('capitalize', function (str) {
         return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
     }
     return ''
+})
+
+handlebars.registerHelper('isArray', function (arg1: string, options) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    return Array.isArray(arg1) || arg1?.includes(',') ? options.fn(this) : options.inverse(this)
 })
 
 const refineTemplatesPath = path.join(__dirname, '../../../templates/refine')
@@ -199,7 +206,7 @@ export const generateServices = async (models: Model[]) => {
 
         const model = getPrisma().${model.name.toLowerCase()};
         `
-
+        template += generateSelect(models, model.name)
         template += generateCreateFunction(model)
         template += generateUpdateFunction(model)
         template += generateDeleteFunction(model)

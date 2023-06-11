@@ -12,7 +12,11 @@ import {
 const endpoints = [
     {{#each endpoints}}
         {
-            method: '{{this.method}}',
+            method: {{#isArray this.method}}
+                        [{{#each this.method}}'{{this}}'{{#unless @last}},{{/unless}}{{/each}}]
+                    {{else}}
+                        '{{this.method}}'
+                    {{/isArray}},
             handler:  async (req: {{this.schemaName}}Type, res: NextApiResponse) =>
                         validateSchema({{this.schemaName}})(
                             req,
@@ -34,7 +38,9 @@ const endpoints = [
 
 
 const handler = async (req: any, res: NextApiResponse) => {
-    const endpoint = endpoints.find((endpoint) => endpoint.method === req.method)
+    const endpoint = endpoints.find(
+        (endpoint) => endpoint.method === req.method || endpoint.method.includes(req.method),
+    )
     await runMiddleware(req, res)
 
     if (!endpoint) {

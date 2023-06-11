@@ -1,5 +1,7 @@
+import { Prisma } from './Prisma'
 import { Model } from './types'
 
+const prisma = new Prisma()
 const generateData = (model: Model) => {
     let data = `...data.body,`
     model.fields.forEach((field) => {
@@ -18,6 +20,7 @@ const generateArgs = (model: Model) => {
     const query = `
         const { query } = data
         const args: Prisma.${model.name}FindManyArgs = {}
+        args.select = select;
         if (query.id) {
             args.where = {
                 ...args.where,
@@ -82,6 +85,7 @@ const generateFindOneFunction = (model: Model) => {
                 where: {
                     id: data.query.id,
                 },
+                select,
             });
             return ${model.name.toLowerCase()};
         };
@@ -99,10 +103,27 @@ const generateFindManyFunction = (model: Model) => {
     `
 }
 
+const generateSelect = (models: Model[], modelName: string) => {
+    const model = models.find((model) => model.name === modelName)
+    if (!model) {
+        return ''
+    }
+    let select = `const select: Prisma.${model.name}Select = {`
+    model.fields.forEach((field) => {
+        if (!prisma.checkScalarType(field.type) && typeof field.relation === 'object') {
+            // do nothing
+        } else {
+            select += `${field.name}: true,`
+        }
+    })
+    select += `}`
+    return select
+}
 export {
     generateCreateFunction,
     generateUpdateFunction,
     generateDeleteFunction,
     generateFindOneFunction,
     generateFindManyFunction,
+    generateSelect,
 }
