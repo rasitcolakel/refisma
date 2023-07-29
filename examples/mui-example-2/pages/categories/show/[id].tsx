@@ -1,68 +1,38 @@
 import React from "react";
-import { useTranslate, useShow, GetOneResponse } from "@refinedev/core";
-import { GetServerSideProps } from "next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { CategorySelect } from "@services/CategoriesService";
-import { Show, TagField } from "@refinedev/mui";
-import { Typography, Stack } from "@mui/material";
-import { axiosInstance } from "@refinedev/simple-rest";
-import dataProvider from "@refinedev/simple-rest";
+import { MuiInferencer } from "@refinedev/inferencer/mui";
 
-interface Props {
-  idData: GetOneResponse<CategorySelect>;
-}
+const fields = [
+  { key: "id", type: "number", relation: false, multiple: false },
+  { key: "name", type: "text", relation: false, multiple: false },
+  {
+    key: "authorId",
+    type: "relation",
+    relation: true,
+    multiple: false,
+    resource: { name: "users", route: "/users" },
+  },
+  {
+    key: "posts",
+    type: "relation",
+    relation: true,
+    multiple: true,
+    resource: { name: "posts", route: "/posts" },
+    relationInfer: { accessor: "id", key: "id", type: "relation" },
+    accessor: "id",
+  },
+];
 
-export default function CategoryCreate({ idData }: Props) {
-  const t = useTranslate();
-  const { queryResult } = useShow<CategorySelect>({
-    resource: "categories",
-    queryOptions: {
-      initialData: idData,
-    },
-  });
-  const { data, isLoading } = queryResult;
+const fieldTransformer = (field: any) => {
+  const f = fields.find((f) => f.key === field.key);
+  return f || field;
+};
 
-  const record = data?.data;
-
+export default function Show() {
   return (
-    <Show isLoading={isLoading}>
-      <Stack gap={1}>
-        <Typography variant="body1" fontWeight="bold" key="Category-id">
-          {t("table.id")}
-        </Typography>
-        <Typography>{record?.id}</Typography>
-        <Typography variant="body1" fontWeight="bold" key="Category-name">
-          {t("table.name")}
-        </Typography>
-        <Typography>{record?.name}</Typography>
-        <Typography variant="body1" fontWeight="bold" key="Category-authorId">
-          {t("table.authorId")}
-        </Typography>
-        <Typography>{record?.author?.email}</Typography>
-      </Stack>
-    </Show>
+    <MuiInferencer
+      resource="categories"
+      action="show"
+      fieldTransformer={fieldTransformer}
+    />
   );
 }
-
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const idData = await dataProvider(
-    process.env.NEXT_PUBLIC_SERVER_API_URL as string,
-    axiosInstance
-  ).getOne({
-    resource: "categories",
-    id: context.query.id as string,
-  });
-
-  if (!idData.data) {
-    return {
-      notFound: true,
-    };
-  }
-
-  return {
-    props: {
-      ...(await serverSideTranslations(context.locale ?? "en", ["common"])),
-      idData,
-    },
-  };
-};

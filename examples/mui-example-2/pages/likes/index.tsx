@@ -1,72 +1,35 @@
 import React from "react";
-import { LikeSelect } from "@services/LikesService";
-import { useTranslate } from "@refinedev/core";
-import { GetServerSideProps } from "next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import {
-  DeleteButton,
-  EditButton,
-  List,
-  ShowButton,
-  useDataGrid,
-  TagField,
-} from "@refinedev/mui";
-import { DataGrid, GridColumns } from "@mui/x-data-grid";
+import { MuiInferencer } from "@refinedev/inferencer/mui";
 
-export default function LikeList() {
-  const t = useTranslate();
-  const { dataGridProps } = useDataGrid<LikeSelect>();
+const fields = [
+  { key: "id", type: "number", relation: false, multiple: false },
+  {
+    key: "postId",
+    type: "relation",
+    relation: true,
+    multiple: false,
+    resource: { name: "posts", route: "/posts" },
+  },
+  {
+    key: "authorId",
+    type: "relation",
+    relation: true,
+    multiple: false,
+    resource: { name: "users", route: "/users" },
+  },
+];
 
-  const columns = React.useMemo<GridColumns<LikeSelect>>(
-    () => [
-      {
-        field: "id",
-        flex: 1,
-        headerName: t("table.id"),
-      },
-      {
-        field: "postId",
-        flex: 1,
-        headerName: t("table.postId"),
-      },
-      {
-        field: "authorId",
-        flex: 1,
-        headerName: t("table.authorId"),
-      },
-      {
-        field: "actions",
-        headerName: t("table.actions"),
-        flex: 1,
-        renderCell: function render({ row }) {
-          return (
-            <>
-              <ShowButton hideText recordItemId={row.id} />
-              <EditButton hideText recordItemId={row.id} />
-              <DeleteButton hideText recordItemId={row.id} />
-            </>
-          );
-        },
-      },
-    ],
-    [t]
-  );
+const fieldTransformer = (field: any) => {
+  const f = fields.find((f) => f.key === field.key);
+  return f || field;
+};
+
+export default function List() {
   return (
-    <List canCreate>
-      <DataGrid
-        {...dataGridProps}
-        autoHeight
-        columns={columns}
-        density="comfortable"
-      />
-    </List>
+    <MuiInferencer
+      resource="likes"
+      action="list"
+      fieldTransformer={fieldTransformer}
+    />
   );
 }
-
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  return {
-    props: {
-      ...(await serverSideTranslations(context.locale ?? "en", ["common"])),
-    },
-  };
-};

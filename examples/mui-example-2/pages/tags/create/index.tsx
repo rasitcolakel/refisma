@@ -1,155 +1,38 @@
 import React from "react";
-import { useTranslate, HttpError, GetListResponse } from "@refinedev/core";
-import { GetServerSideProps } from "next";
-import { serverSideTranslations } from "next-i18next/serverSideTranslations";
-import { useForm } from "@refinedev/react-hook-form";
-import { Controller } from "react-hook-form";
-import { TagSelect } from "@services/TagsService";
-import {
-  TextField,
-  Autocomplete,
-  FormControl,
-  FormLabel,
-  Stack,
-} from "@mui/material";
-import { useAutocomplete, Create, Edit } from "@refinedev/mui";
-import { axiosInstance } from "@refinedev/simple-rest";
-import dataProvider from "@refinedev/simple-rest";
-import { User, Prisma } from "@prisma/client";
+import { MuiInferencer } from "@refinedev/inferencer/mui";
 
-interface Props {
-  authorIdData: GetListResponse<User>;
-}
+const fields = [
+  { key: "id", type: "number", relation: false, multiple: false },
+  { key: "name", type: "text", relation: false, multiple: false },
+  {
+    key: "posts",
+    type: "relation",
+    relation: true,
+    multiple: true,
+    resource: { name: "posts", route: "/posts" },
+    relationInfer: { accessor: "id", key: "id", type: "relation" },
+    accessor: "id",
+  },
+  {
+    key: "authorId",
+    type: "relation",
+    relation: true,
+    multiple: false,
+    resource: { name: "users", route: "/users" },
+  },
+];
 
-export default function TagCreate({ authorIdData }: Props) {
-  const t = useTranslate();
-  const {
-    saveButtonProps,
-    refineCore: { formLoading },
-    register,
-    control,
-    formState: { errors },
-  } = useForm<TagSelect, HttpError>();
+const fieldTransformer = (field: any) => {
+  const f = fields.find((f) => f.key === field.key);
+  return f || field;
+};
 
-  const {
-    autocompleteProps: authorIdAutocompleteProps,
-    queryResult: authorIdQueryResult,
-  } = useAutocomplete<User>({
-    queryOptions: {
-      initialData: authorIdData,
-    },
-    resource: "users",
-    liveMode: "auto",
-    onSearch: (value: string) => [
-      {
-        field: "search",
-        operator: "eq",
-        value,
-      },
-    ],
-  });
-
+export default function Create() {
   return (
-    <Create isLoading={formLoading} saveButtonProps={saveButtonProps}>
-      <Stack gap="24px">
-        <FormControl key={"name"}>
-          <Controller
-            control={control}
-            name="name"
-            render={({ field }) => (
-              <>
-                <FormLabel
-                  required={true}
-                  sx={{
-                    marginBottom: "8px",
-                    fontWeight: "700",
-                    fontSize: "14px",
-                    color: "text.primary",
-                  }}
-                >
-                  {t("table.name")}
-                </FormLabel>
-                <TextField
-                  {...field}
-                  {...register("name", {
-                    required: t("errors.required.field", {
-                      field: t("table.name"),
-                    }),
-                  })}
-                  error={!!(errors as any)?.name}
-                  helperText={(errors as any)?.name?.message}
-                  margin="none"
-                  required
-                  size="small"
-                  variant="outlined"
-                  type="text"
-                />
-              </>
-            )}
-          />
-        </FormControl>
-        <FormControl key={"authorId"}>
-          <Controller
-            control={control}
-            name="authorId"
-            render={({ field }) => (
-              <>
-                <FormLabel
-                  required={false}
-                  sx={{
-                    marginBottom: "8px",
-                    fontWeight: "700",
-                    fontSize: "14px",
-                    color: "text.primary",
-                  }}
-                >
-                  {t("table.authorId")}
-                </FormLabel>
-                <Autocomplete
-                  {...field}
-                  {...register("authorId", {
-                    required: false,
-                  })}
-                  {...authorIdAutocompleteProps}
-                  onChange={(_, v: User | null) => {
-                    if (v) {
-                      field.onChange(v.id);
-                    }
-                  }}
-                  getOptionLabel={(option) => option.email}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      error={!!(errors as any)?.authorId}
-                      helperText={(errors as any)?.authorId?.message}
-                      margin="none"
-                      required
-                      size="small"
-                      variant="outlined"
-                    />
-                  )}
-                />
-              </>
-            )}
-          />
-        </FormControl>
-      </Stack>
-    </Create>
+    <MuiInferencer
+      resource="tags"
+      action="create"
+      fieldTransformer={fieldTransformer}
+    />
   );
 }
-
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const authorIdData = await dataProvider(
-    process.env.NEXT_PUBLIC_SERVER_API_URL as string,
-    axiosInstance
-  ).getList({
-    resource: "users",
-  });
-
-  return {
-    props: {
-      ...(await serverSideTranslations(context.locale ?? "en", ["common"])),
-      authorIdData,
-    },
-  };
-};

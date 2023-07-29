@@ -1,78 +1,59 @@
-import React from 'react'
-import { PostSelect } from '@services/PostsService'
-import { useTranslate } from '@refinedev/core'
-import { GetServerSideProps } from 'next'
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
-import { DeleteButton, EditButton, List, ShowButton, useDataGrid, TagField } from '@refinedev/mui'
-import { MuiInferencer } from '@refinedev/inferencer/mui'
+import React from "react";
+import { MuiInferencer } from "@refinedev/inferencer/mui";
 
-import { DataGrid, GridColumns } from '@mui/x-data-grid'
+const fields = [
+  { key: "id", type: "number", relation: false, multiple: false },
+  { key: "email", type: "text", relation: false, multiple: false },
+  { key: "name", type: "text", relation: false, multiple: false },
+  {
+    key: "posts",
+    type: "relation",
+    relation: true,
+    multiple: true,
+    resource: { name: "posts", route: "/posts" },
+    relationInfer: { accessor: "id", key: "id", type: "relation" },
+    accessor: "id",
+  },
+  {
+    key: "categories",
+    type: "relation",
+    relation: true,
+    multiple: true,
+    resource: { name: "categories", route: "/categories" },
+    relationInfer: { accessor: "id", key: "id", type: "relation" },
+    accessor: "id",
+  },
+  {
+    key: "tags",
+    type: "relation",
+    relation: true,
+    multiple: true,
+    resource: { name: "tags", route: "/tags" },
+    relationInfer: { accessor: "id", key: "id", type: "relation" },
+    accessor: "id",
+  },
+  {
+    key: "likes",
+    type: "relation",
+    relation: true,
+    multiple: true,
+    resource: { name: "likes", route: "/likes" },
+    relationInfer: { accessor: "id", key: "id", type: "relation" },
+    accessor: "id",
+  },
+];
 
-export default function PostList() {
-    return (
-        <MuiInferencer
-            resource="users"
-            action="list"
-            fieldTransformer={(field) => {
-                console.log('field', field)
-                if (field.key === 'categoryId') {
-                    console.log('categoryIdField', field)
-                }
+const fieldTransformer = (field: any) => {
+  const f = fields.find((f) => f.key === field.key);
+  return f || field;
+};
 
-                if (field.key === 'tags') {
-                    console.log('tagsfield', field)
-                    return {
-                        key: 'tags',
-                        type: 'relation',
-                        fieldable: true,
-                        accessor: 'name',
-                        priority: 1,
-                        multiple: true,
-                        relation: true,
-                        resource: {
-                            name: 'tags',
-                            list: '/tags',
-                            create: '/tags/create',
-                            edit: '/tags/edit/:id',
-                            show: '/tags/show/:id',
-                            meta: {
-                                canDelete: true,
-                            },
-                            route: '/tags',
-                            canCreate: true,
-                            canEdit: true,
-                            canShow: true,
-                        },
-                    }
-                }
-                if (field.key === 'authorId') {
-                    return {
-                        ...field,
-                        canRelation: false,
-                        relation: true,
-                        resource: {
-                            ...field.resource,
-                            name: 'users',
-                        },
-                    }
-                }
-
-                if (field.key === 'name') {
-                    return {
-                        ...field,
-                        type: 'text',
-                        canRelation: false,
-                    }
-                }
-                if (field.key === 'authorId') {
-                    return {
-                        ...field,
-                        type: 'relation',
-                        canRelation: false,
-                    }
-                }
-                return field
-            }}
-        />
-    )
+export default function List() {
+  return (
+    <MuiInferencer
+      resource="users"
+      action="list"
+      fieldTransformer={fieldTransformer}
+    />
+  );
 }

@@ -1,73 +1,56 @@
-import React from 'react'
-import { InferField, MuiInferencer } from '@refinedev/inferencer/mui'
+import React from "react";
+import { MuiInferencer } from "@refinedev/inferencer/mui";
 
-export default function PostList() {
-    return (
-        <MuiInferencer
-            resource="posts"
-            action="edit"
-            fieldTransformer={(field) => {
-                const fieldTransforms: InferField[] = [
-                    {
-                        key: 'categoryId',
-                        multiple: false,
-                        priority: 1,
-                        type: 'relation',
-                        relation: true,
-                        resource: {
-                            name: 'categories',
-                            route: '/categories',
-                        },
-                    },
-                    {
-                        key: 'authorId',
-                        type: 'relation',
-                        multiple: false,
-                        resource: {
-                            name: 'users',
-                            route: '/users',
-                        },
-                    },
-                    {
-                        key: 'tags',
-                        multiple: true,
-                        type: 'relation',
-                        relation: true,
-                        priority: 1,
-                        accessor: 'id',
-                        resource: {
-                            name: 'tags',
-                            route: '/tags',
-                        },
-                        relationInfer: {
-                            key: 'name',
-                            accessor: 'name',
-                        },
-                    },
-                    {
-                        key: 'content',
-                        type: 'text',
-                        relation: false,
-                        multiple: false,
-                    },
-                    {
-                        key: 'title',
-                        type: 'text',
-                        relation: false,
-                        multiple: false,
-                    },
-                ]
+const fields = [
+  { key: "id", type: "number", relation: false, multiple: false },
+  { key: "title", type: "text", relation: false, multiple: false },
+  { key: "content", type: "text", relation: false, multiple: false },
+  { key: "published", type: "boolean", relation: false, multiple: false },
+  {
+    key: "authorId",
+    type: "relation",
+    relation: true,
+    multiple: false,
+    resource: { name: "users", route: "/users" },
+  },
+  {
+    key: "categoryId",
+    type: "relation",
+    relation: true,
+    multiple: false,
+    resource: { name: "categories", route: "/categories" },
+  },
+  {
+    key: "tags",
+    type: "relation",
+    relation: true,
+    multiple: true,
+    resource: { name: "tags", route: "/tags" },
+    relationInfer: { accessor: "id", key: "id", type: "relation" },
+    accessor: "id",
+  },
+  {
+    key: "likes",
+    type: "relation",
+    relation: true,
+    multiple: true,
+    resource: { name: "likes", route: "/likes" },
+    relationInfer: { accessor: "id", key: "id", type: "relation" },
+    accessor: "id",
+  },
+];
 
-                const findField = fieldTransforms.find((f) => f.key === field.key)
+const fieldTransformer = (field: any) => {
+  const f = fields.find((f) => f.key === field.key);
+  return f || field;
+};
 
-                if (findField) {
-                    field = {
-                        ...findField,
-                    }
-                }
-                console.log(field.key, field)
-                return field
-            }}
-        />
-    )
+export default function Edit() {
+  return (
+    <MuiInferencer
+      resource="posts"
+      action="edit"
+      fieldTransformer={fieldTransformer}
+    />
+  );
 }

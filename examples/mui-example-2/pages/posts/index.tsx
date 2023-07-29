@@ -1,54 +1,56 @@
-import React from 'react'
-import { MuiInferencer } from '@refinedev/inferencer/mui'
+import React from "react";
+import { MuiInferencer } from "@refinedev/inferencer/mui";
 
-export default function PostList() {
-    return (
-        <MuiInferencer
-            resource="posts"
-            action="list"
-            fieldTransformer={(field) => {
-                if (field.key === 'tags') {
-                    return {
-                        key: 'tags',
-                        multiple: true,
-                        priority: 1,
-                        type: 'relation',
-                        relation: true,
-                        accessor: 'id',
-                        resource: {
-                            name: 'tags',
-                            route: '/tags',
-                        },
-                    }
-                }
-                if (field.key === 'authorId') {
-                    return {
-                        ...field,
-                        canRelation: false,
-                        relation: true,
-                        resource: {
-                            ...field.resource,
-                            name: 'users',
-                        },
-                    }
-                }
+const fields = [
+  { key: "id", type: "number", relation: false, multiple: false },
+  { key: "title", type: "text", relation: false, multiple: false },
+  { key: "content", type: "text", relation: false, multiple: false },
+  { key: "published", type: "boolean", relation: false, multiple: false },
+  {
+    key: "authorId",
+    type: "relation",
+    relation: true,
+    multiple: false,
+    resource: { name: "users", route: "/users" },
+  },
+  {
+    key: "categoryId",
+    type: "relation",
+    relation: true,
+    multiple: false,
+    resource: { name: "categories", route: "/categories" },
+  },
+  {
+    key: "tags",
+    type: "relation",
+    relation: true,
+    multiple: true,
+    resource: { name: "tags", route: "/tags" },
+    relationInfer: { accessor: "id", key: "id", type: "relation" },
+    accessor: "id",
+  },
+  {
+    key: "likes",
+    type: "relation",
+    relation: true,
+    multiple: true,
+    resource: { name: "likes", route: "/likes" },
+    relationInfer: { accessor: "id", key: "id", type: "relation" },
+    accessor: "id",
+  },
+];
 
-                if (field.key === 'content') {
-                    return {
-                        ...field,
-                        type: 'text',
-                        canRelation: false,
-                    }
-                }
-                if (field.key === 'authorId') {
-                    return {
-                        ...field,
-                        type: 'relation',
-                        canRelation: false,
-                    }
-                }
-                return field
-            }}
-        />
-    )
+const fieldTransformer = (field: any) => {
+  const f = fields.find((f) => f.key === field.key);
+  return f || field;
+};
+
+export default function List() {
+  return (
+    <MuiInferencer
+      resource="posts"
+      action="list"
+      fieldTransformer={fieldTransformer}
+    />
+  );
 }
