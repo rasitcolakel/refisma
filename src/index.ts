@@ -37,10 +37,10 @@ export const main = async () => {
             process.exit(1)
         }
 
-        generateRefinePages(selectedModels)
-        generateZodSchema(selectedModels)
-        generateServices(selectedModels)
-        generateEndpoints(selectedModels)
+        await generateRefinePages(selectedModels)
+        await generateZodSchema(selectedModels)
+        await generateServices(selectedModels)
+        await generateEndpoints(selectedModels)
     }
 }
 

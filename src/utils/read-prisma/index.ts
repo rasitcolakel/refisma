@@ -195,8 +195,6 @@ export const generateZodSchema = async (models: Model[]) => {
 }
 
 export const generateServices = async (models: Model[]) => {
-    const serviceFunctions = ['create', 'update', 'delete', 'findOne', 'findMany']
-
     models.forEach((model) => {
         let template = ``
         const imports = `
@@ -264,8 +262,8 @@ export const generateEndpoints = async (models: Model[]) => {
 }
 
 export const generateRefinePages = async (models: Model[]) => {
-    models.forEach((model) => {
-        generateRefinePagesForModel(model)
+    models.forEach(async (model) => {
+        await generateRefinePagesForModel(model)
     })
 }
 
