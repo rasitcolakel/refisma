@@ -60,10 +60,14 @@ npx refisma
 
 ### Packages Needed
 
-````
-npm install @prisma/client zod
-npm install prisma --save-dev
-````
+```bash
+npm install refisma cors @prisma/client zod
+
+# Generate Types for Prisma 
+npm install prisma --save-dev 
+# or
+npx prisma generate
+```
 
 ### .env file
 

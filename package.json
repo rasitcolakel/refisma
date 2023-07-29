@@ -1,11 +1,12 @@
 {
   "name": "refisma",
-  "version": "0.0.41",
+  "version": "0.0.42",
   "description": "Refisma is a CLI to create full-stack resources with Next JS, Prisma and Refine",
   "main": "lib/index.js",
   "source": "src/index.ts",
   "scripts": {
     "dev": "tsc -w",
+    "dev:start": "ts-node src/cli.ts",
     "up": "npm version patch -f",
     "pub": "pnpm build && pnpm up && npm publish",
     "build": "tsc --project tsconfig.build.json",
